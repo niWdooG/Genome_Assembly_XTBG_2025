@@ -1,0 +1,55 @@
+Assembly	Final_genome_with_Reference.fa.masked
+# contigs (>= 0 bp)	3
+# contigs (>= 1000 bp)	3
+# contigs (>= 5000 bp)	3
+# contigs (>= 10000 bp)	3
+# contigs (>= 25000 bp)	3
+# contigs (>= 50000 bp)	3
+Total length (>= 0 bp)	19099067
+Total length (>= 1000 bp)	19099067
+Total length (>= 5000 bp)	19099067
+Total length (>= 10000 bp)	19099067
+Total length (>= 25000 bp)	19099067
+Total length (>= 50000 bp)	19099067
+# contigs	3
+Largest contig	14886168
+Total length	19099067
+Reference length	22250686
+GC (%)	36.27
+Reference GC (%)	36.74
+N50	14886168
+NG50	14886168
+N90	3253290
+NG90	-
+auN	12204928.3
+auNG	10476204.8
+L50	1
+LG50	1
+L90	2
+LG90	-
+# misassemblies	0
+# misassembled contigs	0
+Misassembled contigs length	0
+# local misassemblies	4
+# scaffold gap ext. mis.	0
+# scaffold gap loc. mis.	0
+# unaligned mis. contigs	0
+# unaligned contigs	0 + 3 part
+Unaligned length	194289
+Genome fraction (%)	84.979
+Duplication ratio	1.000
+# N's per 100 kbp	0.00
+# mismatches per 100 kbp	21.50
+# indels per 100 kbp	25.60
+Largest alignment	14753741
+Total aligned length	18904374
+NA50	14753741
+NGA50	14753741
+NA90	3239109
+NGA90	-
+auNA	11989882.9
+auNGA	10291618.7
+LA50	1
+LGA50	1
+LA90	2
+LGA90	-

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 6007 4341" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <g transform="matrix(0.62436,0,0,1.90942,1338.02,-2170.29)">
+        <rect x="3911.16" y="1253" width="3211.29" height="449" style="fill:rgb(204,213,174);"/>
+    </g>
+    <g transform="matrix(0.62436,0,0,1.69405,1338.02,-1043.1)">
+        <rect x="3911.16" y="1253" width="3211.29" height="449" style="fill:rgb(233,237,201);"/>
+    </g>
+    <g transform="matrix(0.62436,0,0,1.69405,1338.02,-282.468)">
+        <rect x="3911.16" y="1253" width="3211.29" height="449" style="fill:rgb(250,237,205);"/>
+    </g>
+    <g transform="matrix(0.62436,0,0,1.69405,1338.02,478.377)">
+        <rect x="3911.16" y="1253" width="3211.29" height="449" style="fill:rgb(221,161,94);"/>
+    </g>
+    <g transform="matrix(0.62436,0,0,1.68562,1338.02,1249.57)">
+        <rect x="3911.16" y="1253" width="3211.29" height="449" style="fill:rgb(188,108,37);"/>
+    </g>
+    <g>
+        <g transform="matrix(1,0,0,1,-1898.83,150.551)">
+            <g transform="matrix(1.1112,0,0,1.45104,660.142,-706.32)">
+                <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(204,213,174);"/>
+            </g>
+            <g transform="matrix(1,0,0,1,94.424,-91.8483)">
+                <g transform="matrix(166.667,0,0,166.667,4094.83,836)">
+                </g>
+                <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">Genome</text>
+            </g>
+        </g>
+        <g transform="matrix(1,0,0,1,-954,120.627)">
+            <g transform="matrix(1.1112,0,0,1.45104,-1300.86,-1044.77)">
+                <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(204,213,174);"/>
+            </g>
+            <g transform="matrix(1,0,0,1,-2082.18,-430.297)">
+                <g transform="matrix(166.667,0,0,166.667,4520.77,836)">
+                </g>
+                <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">RNA-seq data</text>
+            </g>
+        </g>
+        <g transform="matrix(1,0,0,1,1078.33,120.627)">
+            <g transform="matrix(1.1112,0,0,1.45104,-1300.86,-1044.77)">
+                <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(204,213,174);"/>
+            </g>
+            <g transform="matrix(1,0,0,1,-2017.32,-430.297)">
+                <g transform="matrix(166.667,0,0,166.667,4391.13,836)">
+                </g>
+                <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">Protein data</text>
+            </g>
+        </g>
+    </g>
+    <g transform="matrix(1,0,0,1,-1898.83,775.366)">
+        <g transform="matrix(1.1112,0,0,1.45104,660.142,-706.32)">
+            <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(233,237,201);"/>
+        </g>
+        <g transform="matrix(1,0,0,1,-164.436,-91.8483)">
+            <g transform="matrix(166.667,0,0,166.667,4613.55,836)">
+            </g>
+            <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">GeneMark-ETP</text>
+        </g>
+    </g>
+    <g transform="matrix(1,0,0,1,-1898.83,1536)">
+        <g transform="matrix(1.1112,0,0,1.45104,660.142,-706.32)">
+            <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(250,237,205);"/>
+        </g>
+        <g transform="matrix(1,0,0,1,-35.0417,-91.8483)">
+            <g transform="matrix(166.667,0,0,166.667,4363.22,836)">
+            </g>
+            <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">AUGUSTUS</text>
+        </g>
+    </g>
+    <g transform="matrix(1,0,0,1,-1898.83,2296.84)">
+        <g transform="matrix(1.1112,0,0,1.45104,660.142,-706.32)">
+            <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(221,161,94);"/>
+        </g>
+        <g transform="matrix(1,0,0,1,84.4245,-91.8483)">
+            <g transform="matrix(166.667,0,0,166.667,4113.22,836)">
+            </g>
+            <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">TSEBRA</text>
+        </g>
+    </g>
+    <g transform="matrix(1,0,0,1,-929.335,-133.922)">
+        <g transform="matrix(1.1112,0,0,1.45104,-309.358,2483.18)">
+            <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(188,108,37);"/>
+        </g>
+        <g transform="matrix(1,0,0,1,-1185,3097.65)">
+            <g transform="matrix(166.667,0,0,166.667,4714.95,836)">
+            </g>
+            <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">Final annotation</text>
+        </g>
+    </g>
+    <path d="M1079.18,756.763L1241,849L1070.12,923.116C1113.97,883.793 1118.5,800.616 1079.18,756.763Z" style="fill:rgb(204,213,174);"/>
+    <path d="M847,639.178C847,639.178 959.688,803.998 1007.78,823.437C1029.34,832.15 1068.11,837.932 1107.92,841.751" style="fill:none;stroke:rgb(204,213,174);stroke-width:55.53px;"/>
+    <g transform="matrix(-1,0,0,1,3916,0)">
+        <g transform="matrix(-1,0,0,1,3916,-0)">
+            <path d="M2845.88,923.116L2675,849L2836.82,756.763C2797.5,800.616 2802.03,883.793 2845.88,923.116Z" style="fill:rgb(204,213,174);"/>
+            <path d="M3069,639.178C3069,639.178 2956.31,803.998 2908.22,823.437C2886.66,832.15 2847.89,837.932 2808.08,841.751" style="fill:none;stroke:rgb(204,213,174);stroke-width:55.53px;"/>
+        </g>
+    </g>
+    <g transform="matrix(0.374722,0.343897,-0.927137,0.138993,2279.78,671.195)">
+        <g transform="matrix(0.374722,-0.927137,2.49953,1.01024,-2531.96,1435.6)">
+            <path d="M2005.77,1119.78L1957.66,1215.98L1909.57,1119.78C1933.62,1143.83 1981.72,1143.83 2005.77,1119.78Z" style="fill:rgb(204,213,174);"/>
+            <path d="M1957.66,1155.05C1956.68,1155.05 1951.05,1155.05 1946.34,1150.34C1944.89,1148.89 1943.68,1147.13 1942.9,1145.24C1942.09,1143.29 1941.68,1141.14 1941.63,1139.03L1941.63,1079.54C1942.05,1077.47 1942.09,1075.28 1942.9,1073.33C1943.68,1071.43 1944.89,1069.68 1946.34,1068.23C1947.79,1066.78 1949.55,1065.57 1951.44,1064.78C1951.46,1064.78 1957.67,1063.52 1957.67,1063.52C1959.75,1063.94 1961.94,1063.97 1963.89,1064.78C1965.78,1065.57 1967.54,1066.78 1968.99,1068.23C1970.44,1069.68 1971.64,1071.43 1972.43,1073.33C1973.25,1075.28 1973.54,1077.43 1973.7,1079.54L1973.7,1139.03C1973.28,1141.1 1973.25,1143.29 1972.43,1145.24C1971.64,1147.13 1970.44,1148.89 1968.99,1150.34C1964.28,1155.05 1958.65,1155.05 1957.66,1155.05Z" style="fill:rgb(204,213,174);"/>
+        </g>
+    </g>
+    <g transform="matrix(0.374722,0.927137,-0.927137,0.374722,2279.78,508.309)">
+        <g transform="matrix(0.374722,-0.927137,0.927137,0.374722,-1325.55,1923.19)">
+            <path d="M2040.97,1810.43L1957.66,1977.03L1874.37,1810.43C1916.02,1852.08 1999.32,1852.08 2040.97,1810.43Z" style="fill:rgb(233,237,201);"/>
+            <path d="M1957.66,1609.23L1957.66,1843.75" style="fill:none;stroke:rgb(233,237,201);stroke-width:55.53px;"/>
+        </g>
+    </g>
+    <g transform="matrix(0.374722,0.927137,-0.927137,0.374722,2279.78,1268.12)">
+        <g transform="matrix(0.374722,-0.927137,0.927137,0.374722,-2030.01,1638.47)">
+            <path d="M2040.97,2570.24L1957.66,2736.84L1874.37,2570.24C1916.02,2611.89 1999.32,2611.89 2040.97,2570.24Z" style="fill:rgb(250,237,205);"/>
+            <path d="M1957.66,2369.04L1957.66,2603.56" style="fill:none;stroke:rgb(250,237,205);stroke-width:55.53px;"/>
+        </g>
+    </g>
+    <g transform="matrix(0.374722,0.927137,-0.927137,0.374722,2279.78,2026.86)">
+        <g transform="matrix(0.374722,-0.927137,0.927137,0.374722,-2733.46,1354.16)">
+            <path d="M2040.97,3328.98L1957.66,3495.58L1874.37,3328.98C1916.02,3370.63 1999.32,3370.63 2040.97,3328.98Z" style="fill:rgb(221,161,94);"/>
+            <path d="M1957.66,3127.78L1957.66,3362.3" style="fill:none;stroke:rgb(221,161,94);stroke-width:55.53px;"/>
+        </g>
+    </g>
+    <g>
+        <g transform="matrix(1,0,0,1,571.083,-366.226)">
+            <text x="3428px" y="1008.12px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">• Masked genome</text>
+            <text x="3428px" y="1180.24px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">• Protein evidence</text>
+            <g transform="matrix(166.667,0,0,166.667,4996.12,1352.36)">
+            </g>
+            <text x="3428px" y="1352.36px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">• RNA-seq evidence</text>
+        </g>
+        <g transform="matrix(1,0,0,1,242.499,0)">
+            <g transform="matrix(166.667,0,0,166.667,4935.22,405)">
+            </g>
+            <text x="4139px" y="405px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">Input data</text>
+        </g>
+    </g>
+    <g transform="matrix(1,0,0,1,388.897,580.731)">
+        <g>
+            <text x="3450.84px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">Finds patterns of where</text>
+            <g transform="matrix(166.667,0,0,166.667,5363.2,1008.12)">
+            </g>
+            <text x="3464.68px" y="1008.12px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">genes might be located</text>
+        </g>
+    </g>
+    <g transform="matrix(1,0,0,1,0,1582.01)">
+        <g transform="matrix(1,0,0,1,1963.55,-348.047)">
+            <text x="1914.32px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:116.667px;">Uses the hints from GeneMark &amp;</text>
+            <text x="1852.8px" y="956.483px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:116.667px;">its own algorithms to predict exact</text>
+            <text x="1901.42px" y="1076.97px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:116.667px;">gene boundaries, exons, introns,</text>
+            <g transform="matrix(116.667,0,0,116.667,3444.32,1197.45)">
+            </g>
+            <text x="2186.62px" y="1197.45px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:116.667px;">and coding sequences</text>
+        </g>
+        <g transform="matrix(1,0,0,1,391.186,1278.12)">
+            <text x="3650.1px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">Final annotation in</text>
+            <g transform="matrix(166.667,0,0,166.667,4295.49,1008.12)">
+            </g>
+            <g transform="matrix(166.667,0,0,166.667,4348.96,1008.12)">
+            </g>
+            <g transform="matrix(166.667,0,0,166.667,5059.97,1008.12)">
+            </g>
+            <text x="3721.6px" y="1008.12px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">gtf or gﬀ formats</text>
+        </g>
+        <g transform="matrix(1,0,0,1,386.832,520.484)">
+            <text x="3756.35px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">Merges the best</text>
+            <g transform="matrix(166.667,0,0,166.667,4839.92,1008.12)">
+            </g>
+            <text x="3941.65px" y="1008.12px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">predictions</text>
+        </g>
+    </g>
+</svg>

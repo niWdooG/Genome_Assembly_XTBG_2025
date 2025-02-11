@@ -1,0 +1,114 @@
+Aligning contigs to reference...
+	Aligning contigs to the reference
+Filtering alignments...
+Parsing coords...
+Loading reference...
+	Loaded [GWHBDNP00000004]
+	Total Regions: 1
+	Total Region Length: 22250686
+Analyzing contigs...
+CONTIG: contig_5 (959609bp)
+Best alignment score: 595162.7 (LEN: 598394, IDY: 99.46), Total number of alignments: 2
+			Looking for the best set of alignments (out of 2 total alignments)
+			The best set is below. Score: 904925.5, number of alignments: 2, unaligned bases: 48085
+		This contig is misassembled.
+		This contig is partially unaligned. (Aligned 911524 out of 959609 non-N bases (94.99%))
+			Excluding internal overlap of size 1289 between Alignment 1 and 2: 4601380 4917001 | 597106 911524 | 315622 314419 --> 4602680 4917001 | 598395 911524 | 314322 313130
+			Real Alignment 1: 4002796 4603117 | 1 598394 | 600322 598394 | 99.46 | GWHBDNP00000004 contig_5
+			  Overlap between these two alignments (local misassembly). Inconsistency = -438
+			Real Alignment 2: 4602680 4917001 | 598395 911524 | 314322 313130 | 98.94 | GWHBDNP00000004 contig_5
+		Unaligned bases: 48085
+
+CONTIG: contig_3 (3253290bp)
+Best alignment score: 3186806.8 (LEN: 3188082, IDY: 99.96), Total number of alignments: 28
+			Looking for the best set of alignments (out of 28 total alignments)
+			Skipping redundant alignments after choosing the best set of alignments
+		Skipping redundant alignment 3955124 4002798 | 3159979 3207861 | 47675 47883 | 98.57 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3943881 4002798 | 3149736 3208854 | 58918 59119 | 98.68 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3952136 4002798 | 3159979 3210843 | 50663 50865 | 98.59 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3951141 4002798 | 3159981 3211838 | 51658 51858 | 98.59 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3950144 4002798 | 3159979 3212832 | 52655 52854 | 98.62 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3939880 4002798 | 3150720 3213828 | 62919 63109 | 98.7 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3948659 4002798 | 3161481 3215818 | 54140 54338 | 98.63 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3949147 4002798 | 3162466 3216314 | 53652 53849 | 98.62 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3936891 4002798 | 3151218 3217308 | 65908 66091 | 98.7 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3948649 4002798 | 3164950 3219296 | 54150 54347 | 98.64 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3949157 4002798 | 3165955 3219795 | 53642 53841 | 98.63 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3949147 4002798 | 3166943 3220791 | 53652 53849 | 98.64 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3948650 4002798 | 3167439 3221789 | 54149 54351 | 98.64 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3943875 4002798 | 3163669 3222783 | 58924 59115 | 98.67 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3946173 4002798 | 3166958 3223779 | 56626 56822 | 98.65 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3950152 4002798 | 3171919 3224774 | 52647 52856 | 98.65 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3948649 4002798 | 3171414 3225768 | 54150 54355 | 98.65 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3940686 4002798 | 3164467 3226763 | 62113 62297 | 98.67 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3948659 4002798 | 3173406 3227758 | 54140 54353 | 98.65 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3948659 4002798 | 3175394 3229745 | 54140 54352 | 98.64 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3919703 4002798 | 3147981 3231237 | 83096 83257 | 98.75 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3928715 4002798 | 3160476 3234714 | 74084 74239 | 98.69 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3940686 4002798 | 3174903 3237192 | 62113 62290 | 98.63 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3921741 4002798 | 3160476 3241657 | 81058 81182 | 98.67 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3918743 4002798 | 3159472 3243644 | 84056 84173 | 98.67 | GWHBDNP00000004 contig_3
+		Skipping redundant alignment 3898285 4002798 | 3147981 3252591 | 104514 104611 | 98.69 | GWHBDNP00000004 contig_3
+		This contig has several significant sets of alignments. [An ambiguously mapped contig]
+		Using only the very best set (option --ambiguity-usage is set to "one").
+			The best set is below. Score: 3237122.4, number of alignments: 2, unaligned bases: 14181
+		This contig is misassembled.
+		This contig is partially unaligned. (Aligned 3239109 out of 3253290 non-N bases (99.56%))
+			Excluding internal overlap of size 54283 between Alignment 1 and 2: 3886827 3992073 | 3147981 3253290 | 105247 105310 --> 3941193 3992073 | 3202264 3253290 | 50881 51027
+			Real Alignment 1: 347696 3536296 | 14182 3202263 | 3188601 3188082 | 99.96 | GWHBDNP00000004 contig_3
+			  Gap between these two alignments (local misassembly). Inconsistency = 404896
+			Real Alignment 2: 3941193 3992073 | 3202264 3253290 | 50881 51027 | 98.7 | GWHBDNP00000004 contig_3
+		Unaligned bases: 14181
+
+CONTIG: contig_6 (14886168bp)
+Best alignment score: 14620708.8 (LEN: 14622171, IDY: 99.99), Total number of alignments: 4
+			Looking for the best set of alignments (out of 4 total alignments)
+		This contig has several significant sets of alignments. [An ambiguously mapped contig]
+		Using only the very best set (option --ambiguity-usage is set to "one").
+			The best set is below. Score: 14751405.0, number of alignments: 4, unaligned bases: 132023
+		This contig is misassembled.
+		This contig is partially unaligned. (Aligned 14754145 out of 14886168 non-N bases (99.11%))
+			Real Alignment 1: 7459586 7503850 | 100460 144593 | 44265 44134 | 98.97 | GWHBDNP00000004 contig_6
+			  Gap between these two alignments (local misassembly). Inconsistency = -482285
+			Real Alignment 2: 7045502 7071148 | 168530 194178 | 25647 25649 | 98.99 | GWHBDNP00000004 contig_6
+			  Gap between these two alignments (local misassembly). Inconsistency = 488647
+			Excluding internal overlap of size 404 between Alignment 3 and 4: 7565898 7628462 | 200281 262875 | 62565 62595 --> 7565898 7628058 | 200281 262471 | 62161 62191
+			Real Alignment 3: 7565898 7628058 | 200281 262471 | 62161 62191 | 99.17 | GWHBDNP00000004 contig_6
+			  Stretch of 0 mismatches between these two alignments (number of Ns: 0)
+			Real Alignment 4: 7628059 22250647 | 262472 14884642 | 14622589 14622171 | 99.99 | GWHBDNP00000004 contig_6
+		Unaligned bases: 132023
+
+Analyzing coverage...
+Writing SNPs into /home/user1/0_Workshop_2025/Annotation/quast_results/results_2025_02_05_06_22_32/contigs_reports/minimap_output/Final_genome_with_Reference-fa-masked.used_snps
+
+Analysis is finished!
+Founded SNPs were written into /home/user1/0_Workshop_2025/Annotation/quast_results/results_2025_02_05_06_22_32/contigs_reports/minimap_output/Final_genome_with_Reference-fa-masked.used_snps
+
+Results:
+	Local Misassemblies: 4
+	Misassemblies: 0
+		Relocations: 0
+		Translocations: 0
+		Inversions: 0
+	Scaffold gap extensive misassemblies: 0
+	Scaffold gap local misassemblies: 0
+	Misassembled Contigs: 0
+	Misassembled Contig Bases: 0
+	Misassemblies Inter-Contig Overlap ("Extra" Aligned Bases): 0
+Unaligned Contigs: 0 + 3 part
+Half Unaligned Contigs with Misassemblies: 0
+Unaligned Bases in Fully and Partially Unaligned Contigs: 194289
+
+Ambiguously Mapped Contigs: 2
+Total Bases in Ambiguously Mapped Contigs: 18139458
+"Extra" Aligned Bases in Ambiguously Mapped Contigs: 0
+Note that --allow-ambiguity option was set to "one" and only first alignment per each of these contigs was used (there is no "extra" aligned bases).
+
+	Covered Bases in Reference: 18908350
+	Raw Aligned Bases in Assembly: 18904374
+	Total Aligned Bases in Assembly (with "Extras"): 18904374
+
+	SNPs: 4065
+	Insertions: 1268
+	Deletions: 5278
+

@@ -1,0 +1,3123 @@
+---
+title:  "Quality check and genome assembly using Illumina, ONT, HiFi, and Hi-C data"
+author: <p class="text-right"><font size="1">Created by </font>[<font size="2">Evgenii Baiakhmetov</font>](https://www.researchgate.net/profile/Evgenii-Baiakhmetov)</p>
+output: 
+  html_document:
+    self_contained: false
+    theme: journal
+    highlight: monochrome
+    toc: true
+    toc_depth: 4  # Shows headers up to ####
+    toc_float: true
+    #includes:
+    #  in_header: header.html
+---
+
+<style>
+/* Base Code Block Styling */
+.code-header { /* Keep your existing header styles */ }
+.copy-button { /* Keep your button styles */ }
+
+/* Bash Syntax Coloring */
+.code-text pre {
+  color: #c9d1d9; /* Base text color */
+  font-family: 'Fira Code', monospace;
+}
+
+.bash-keyword { color: #ff7b72; } /* Commands like 'if', 'for' */
+.bash-string { color: #a5d6ff; }  /* Strings in quotes */
+.bash-comment { color: #8b949e; } /* Comments */
+.bash-function { color: #d2a8ff; } /* Function names */
+.bash-variable { color: #79c0ff; } /* Variables like $VAR */
+.bash-parameter { color: #c9d1d9; } /* Flags like --min-alignment */
+.bash-operator { color: #ff7b72; }  /* &&, ||, |, etc. */
+
+/* Line continuation highlighting */
+.bash-line-continuation::before {
+  content: "↳ ";
+  color: #8b949e;
+  margin-right: 5px;
+}
+</style>
+
+<style type="text/css">
+#TOC {
+  color: black; 
+}
+</style>
+
+<style>
+.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+    background-color: #25a4be;
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy('')
+```
+
+<style>
+  /* Main header container - Uses CSS Grid for precise layout */
+  .code-header {
+    background-color: #50505A;    /* Dark gray background */
+    color: white;                 /* Text color */
+    display: grid;                /* Grid layout for columns */
+    grid-template-columns: 1fr auto; /* Left/right column sizing */
+    align-items: center;          /* Vertical centering for all items */
+    padding: 0 15px;              /* Horizontal padding */
+    height: 40px;                 /* Fixed height container */
+    box-sizing: border-box;       /* Include padding in height calculation */
+    border-radius: 10px 10px 0 0; /* Rounded top corners */
+  }
+
+  /* Text styling for OS name */
+  .header-text {
+    font: bold 14px/40px Arial, sans-serif; /* Font size/line-height matches container height */
+    height: 100%;                 /* Full container height */
+  }
+
+  /* Copy button styling */
+  .copy-button {
+    background: #50505A;          /* Match header background */
+    color: white;                 /* Text color */
+    border: none;                 /* Remove default border */
+    padding: 0 15px;              /* Horizontal padding */
+    border-radius: 4px;           /* Rounded corners */
+    font: 14px/34px Arial, sans-serif; /* Line-height calculation: 40px container - 2*3px margin */
+    cursor: pointer;              /* Pointer cursor on hover */
+    height: 34px;                 /* Calculated height: 40px container - 6px total margin */
+    margin: 3px 0;                /* Vertical centering: (40-34)/2 = 3px */
+    transition: background 0.2s;  /* Smooth hover effect */
+  }
+
+  /* Button hover state */
+  .copy-button:hover {
+    background: #50505A;          /* Lighten background on hover */
+  }
+
+  /* Code content section - Uses flexbox for vertical centering */
+  .code-content {
+    background: #181D28;          /* Dark background */
+    color: white;                 /* Text color */
+    padding: 15px;                /* Internal spacing */
+    font-family: Monaco, monospace;/* Monospace font for code */
+    border-radius: 0 0 10px 10px; /* Rounded bottom corners */
+    min-height: 30px;            /* Minimum section height */
+    display: flex;                /* Flexbox for centering */
+    align-items: center;          /* Vertical centering */
+    justify-content: flex-start;  /* Horizontal alignment (left) */
+    box-sizing: border-box;       /* Include padding in height */
+  }
+
+  /* Content text styling */
+  .code-text {
+    width: 100%;                  /* Full width text container */
+    word-break: break-all;        /* Handle long unbroken strings */
+  }
+    .code-text pre {
+    margin: 0;                   /* Remove default <pre> margin */
+    padding: 0;                  /* Remove default <pre> padding */
+    background: transparent;     /* Inherit dark background */
+    color: inherit;              /* Use parent's text color */
+    border: none;                /* Remove borders */
+    white-space: pre-wrap;       /* Allow wrapping but keep line breaks */
+    font-family: inherit;        /* Use Monaco font from parent */
+    line-height: 1.4;            /* Consistent line spacing */
+  }
+</style>
+
+# [I] Preface
+## In a nutshell
+<span style="color:black">
+<p class="text-justify">This tutorial is, to some extent, a simplified version of **[my previous tutorial](https://niwdoog.github.io/Genome_Assembly_Long_Reads_Hi-C/)** on chromosome-level scaffolding and annotation of the diploid plant *Arabidopsis thaliana* (2n=2x=10). In this version, I include a Quality Check (QC) assessment step and employ an approach for identifying syntenic blocks commonly used in comparative genomics. Additionally, I have downsized the dataset to include only the smallest chromosome, Chr4 (ca. 22.2 Mbp), which should reduce the overall time required to complete the analysis. The tutorial is part of the workshop ***Introduction to Bioinformatics and OMICs Data Analysis***, conducted at XTBG from February 10–14, 2025 (workshop leader: **[Dr Guillem Ylla](https://ylla-lab.github.io/)**).</p>
+
+<div class="alert alert-info" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+Please note that all data used here was produced by **[Wang B et al., 2021](https://doi.org/10.1016/j.gpb.2021.08.003)**. Additionally, please be aware that this tutorial does not aim to reproduce all analyses from the aforementioned article in detail.
+</span>
+</div>
+
+## Learning outcomes
+<span style="color:black">
+After completing this tutorial, you will be able to:
+
+* <span style="color:black">perform a quality check of the raw sequencing data.</span>
+* <span style="color:black">assemble a genome of interest using data produced by second- and third-generation sequencing technologies, including [Illumina](https://www.illumina.com/), [Oxford Nanopore Technologies (ONT)](https://nanoporetech.com/), and [Pacific Biosciences](https://www.pacb.com/) Circular Consensus Sequencing ([CCS](https://www.pacb.com/technology/hifi-sequencing/)) reads.</span>
+* <span style="color:black">scaffold assembled contigs to the scale of full chromosomes using a reference genome.</span>
+* <span style="color:black">scaffold assembled contigs to the scale of full chromosomes using Hi-C data.</span>
+* <span style="color:black">identify, annotate and mask transposable elements.</span>
+* <span style="color:black">annotate genomes using RNA-Seq and protein homology information.</span>
+* <span style="color:black">visualise the results.</span>
+
+## Keywords
+<span style="color:black">
+<p class="text-justify">
+Bioinformatics, Quality Check, ONT sequencing, HiFi sequencing, Illumina sequencing, Hi-C sequencing, RNA sequencing, genome assembly, genome annotation, Synteny, data visualisation.</p>
+
+# [II] Conda & sequencing data
+## Conda, software, and packages
+<div class="alert alert-danger" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+**IMPORTANT!** Please refer to **[the aforementioned tutorial](https://niwdoog.github.io/Genome_Assembly_Long_Reads_Hi-C/)** on creating and setting up conda environments, as well as package and software installation. Additionally, you may consider switching to **[mamba](https://github.com/mamba-org/mamba)** over conda.
+</div>        
+</span>
+
+## Downloading raw sequence data
+<span style="color:black">
+<p class="text-justify">A subset of the Illumina, ONT, HiFi, and Hi-C reads was privately provided to the workshop participants. The files are now available for download through the **[Zenodo repository](https://doi.org/10.5281/zenodo.xyz)**.</p>
+
+## Subsampling workflow
+<span style="color:black">
+<p class="text-justify">To reproduce all the steps for data subsampling while keeping only the reads aligned to Chromosome 4, follow the steps below.</p>
+
+### [1] Dataset
+
+<p class="text-justify">First, create directories for Illumina, RNA-Seq, Hi-C, HiFi, and ONT data:</p>
+
+<!-- Code -->
+<div class="code-header">
+  <div class="header-text">Bash</div>
+  <button class="copy-button" onclick="copyText('code1')">Copy</button>
+</div>
+<div class="code-content">
+  <div id="code1" class="code-text"><pre><span class="bash-keyword">mkdir</span> <span class="bash-string">Illumina RNAseq HiC HiFi ONT</span></pre>
+  </div>
+</div>
+
+</p>
+
+<p class="text-justify">Then, download the following files:</p>
+<p class="text-justify">(1) **Illumina** folder:</p>
+
+<!-- Code -->
+<div class="code-header">
+  <div class="header-text">Bash</div>
+  <button class="copy-button" onclick="copyText('code2')">Copy</button>
+</div>
+<div class="code-content">
+  <div id="code2" class="code-text">
+<pre><span class="bash-keyword">nohup</span> <span class="bash-keyword">wget</span> <span class="bash-string">ftp://download.big.ac.cn/gsa/CRA004538/CRR302670/CRR302670_f1.fastq.gz</span> <span class="bash-operator">></span> <span class="bash-string">CRR302670_f1.out</span> <span class="bash-operator">2>&1</span> <span class="bash-operator">&</span>
+<span class="bash-keyword">nohup</span> <span class="bash-keyword">wget</span> <span class="bash-string">ftp://download.big.ac.cn/gsa/CRA004538/CRR302670/CRR302670_r2.fastq.gz</span> <span class="bash-operator">></span> <span class="bash-string">CRR302670_r2.out</span> <span class="bash-operator">2>&1</span> <span class="bash-operator">&</span></pre>
+  </div>
+</div>
+
+</p>
+
+<p class="text-justify">(2) **RNAseq** folder:</p>
+
+<!-- Code -->
+<div class="code-header">
+  <div class="header-text">Bash</div>
+  <button class="copy-button" onclick="copyText('code3')">Copy</button>
+</div>
+<div class="code-content">
+  <div id="code3" class="code-text">
+<pre><span class="bash-keyword">nohup</span> <span class="bash-keyword">wget</span> <span class="bash-string">https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR3581356/SRR3581356</span> <span class="bash-operator">></span> <span class="bash-string">wget_SRR3581356.out</span> <span class="bash-operator">2>&1</span> <span class="bash-operator">&</span> <span class="bash-comment"># root</span>
+<span class="bash-keyword">nohup</span> <span class="bash-keyword">wget</span> <span class="bash-string">https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR3581693/SRR3581693</span> <span class="bash-operator">></span> <span class="bash-string">wget_SRR3581693.out</span> <span class="bash-operator">2>&1</span> <span class="bash-operator">&</span> <span class="bash-comment"># flower</span>
+<span class="bash-keyword">nohup</span> <span class="bash-keyword">wget</span> <span class="bash-string">https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR3581681/SRR3581681</span> <span class="bash-operator">></span> <span class="bash-string">wget_SRR3581681.out</span> <span class="bash-operator">2>&1</span> <span class="bash-operator">&</span> <span class="bash-comment"># leaf</span>
+<span class="bash-keyword">nohup</span> <span class="bash-keyword">wget</span> <span class="bash-string">https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR3581705/SRR3581705</span> <span class="bash-operator">></span> <span class="bash-string">wget_SRR3581705.out</span> <span class="bash-operator">2>&1</span> <span class="bash-operator">&</span> <span class="bash-comment"># internode</span>
+<span class="bash-keyword">nohup</span> <span class="bash-keyword">wget</span> <span class="bash-string">https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR3581706/SRR3581706</span> <span class="bash-operator">></span> <span class="bash-string">wget_SRR3581706.out</span> <span class="bash-operator">2>&1</span> <span class="bash-operator">&</span> <span class="bash-comment"># seed</span>
+<span class="bash-keyword">nohup</span> <span class="bash-keyword">wget</span> <span class="bash-string">https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR3581708/SRR3581708</span> <span class="bash-operator">></span> <span class="bash-string">wget_SRR3581708.out</span> <span class="bash-operator">2>&1</span> <span class="bash-operator">&</span> <span class="bash-comment"># silique</span>
+<span class="bash-keyword">nohup</span> <span class="bash-keyword">wget</span> <span class="bash-string">https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR3581703/SRR3581703</span> <span class="bash-operator">></span> <span class="bash-string">wget_SRR3581703.out</span> <span class="bash-operator">2>&1</span> <span class="bash-operator">&</span> <span class="bash-comment"># pedicel</span></pre>
+  </div>
+</div>
+
+</p>
+
+<p class="text-justify">(3) **HiC** folder:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code4')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code4" class="code-text">
+  <pre>
+<span class="bash-keyword">nohup</span> <span class="bash-keyword">wget</span> <span class="bash-string">ftp://download.big.ac.cn/gsa/CRA004538/CRR302669/CRR302669_f1.fastq.gz</span> <span class="bash-operator">></span> <span class="bash-string">CRR302669_f1.out</span> <span class="bash-operator">2>&1</span> <span class="bash-operator">&</span>
+<span class="bash-keyword">nohup</span> <span class="bash-keyword">wget</span> <span class="bash-string">ftp://download.big.ac.cn/gsa/CRA004538/CRR302669/CRR302669_r2.fastq.gz</span> <span class="bash-operator">></span> <span class="bash-string">CRR302669_r2.out</span> <span class="bash-operator">2>&1</span> <span class="bash-operator">&</span>
+</pre>
+  </div>
+</div>
+
+</p>
+
+<p class="text-justify">(4) **HiFi** folder:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code5')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code5" class="code-text">
+  <pre>
+<span class="bash-keyword">nohup</span> <span class="bash-keyword">wget</span> <span class="bash-string">ftp://download.big.ac.cn/gsa/CRA004538/CRR302668/CRR302668.fastq.gz</span> <span class="bash-operator">></span> <span class="bash-string">CRR302668.out</span> <span class="bash-operator">2>&1</span> <span class="bash-operator">&</span>
+</pre>
+  </div>
+</div>
+
+</p>
+
+<p class="text-justify">(5) **ONT** folder:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code6')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code6" class="code-text">
+  <pre>
+<span class="bash-keyword">nohup</span> <span class="bash-keyword">wget</span> <span class="bash-string">ftp://download.big.ac.cn/gsa/CRA004538/CRR302667/CRR302667.fastq.gz</span> <span class="bash-operator">></span> <span class="bash-string">CRR302667.out</span> <span class="bash-operator">2>&1</span> <span class="bash-operator">&</span>
+</pre>
+  </div>
+</div>
+</p>
+
+### [2] Chromosome subsetting
+<span style="color:black">
+<p class="text-justify"> Download the **reference** genome:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code7')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code7" class="code-text">
+  <pre>
+<span class="bash-keyword">nohup</span> <span class="bash-keyword">wget</span> <span class="bash-string">https://download.cncb.ac.cn/gwh/Plants/Arabidopsis_thaliana_AT_GWHBDNP00000000/GWHBDNP00000000.genome.fasta.gz</span> <span class="bash-operator">></span> <span class="bash-string">Arabidopsis_genome.out</span> <span class="bash-operator">2>&1</span> <span class="bash-operator">&</span>
+</pre>
+  </div>
+</div>
+
+</p>
+
+<p class="text-justify">Unzip the compressed file:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code8')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code8" class="code-text">
+  <pre>
+<span class="bash-keyword">unpigz</span> <span class="bash-option">-k</span> <span class="bash-option">-p</span> <span class="bash-value">4</span> <span class="bash-string">GWHBDNP00000000.genome.fasta.gz</span>
+</pre>
+  </div>
+</div>
+
+</p>
+
+<p class="text-justify">Check the headers:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code9')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code9" class="code-text">
+  <pre>
+<span class="bash-keyword">grep</span> <span class="bash-string">">"</span> <span class="bash-string">GWHBDNP00000000.genome.fasta</span> <span class="bash-operator">></span> <span class="bash-string">GWHBDNP00000000.genome_Chr_list.txt</span> <span class="bash-operator">&&</span> <span class="bash-keyword">cat</span> <span class="bash-string">GWHBDNP00000000.genome_Chr_list.txt</span>
+</pre>
+  </div>
+</div>
+<span style="color:black">
+
+</p>
+
+<p class="text-justify">It should look like this:</p>
+
+<div class="alert alert-info" style="display: flex; align-items: center; min-height: 100px; border-radius: 10px; font-family: monospace;">
+  <table style="color: black; margin: auto; border-collapse: collapse;">
+    <tr>
+      <td style="padding-right: 20px;">GWHBDNP00000001</td>
+      <td style="padding-right: 20px;">Chromosome 1</td>
+      <td style="padding-right: 20px;">Complete=F</td>
+      <td style="padding-right: 20px;">Circular=F</td>
+      <td style="padding-right: 20px;">OriSeqID=chr1</td>
+      <td>Len=32659241</td>
+    </tr>
+    <tr>
+      <td style="padding-right: 20px;">GWHBDNP00000002</td>
+      <td style="padding-right: 20px;">Chromosome 2</td>
+      <td style="padding-right: 20px;">Complete=F</td>
+      <td style="padding-right: 20px;">Circular=F</td>
+      <td style="padding-right: 20px;">OriSeqID=chr2</td>
+      <td>Len=22712559</td>
+    </tr>
+     <tr>
+      <td style="padding-right: 20px;">GWHBDNP00000003</td>
+      <td style="padding-right: 20px;">Chromosome 3</td>
+      <td style="padding-right: 20px;">Complete=F</td>
+      <td style="padding-right: 20px;">Circular=F</td>
+      <td style="padding-right: 20px;">OriSeqID=chr3</td>
+      <td>Len=26161332</td>
+    </tr>
+      <tr>
+      <td style="padding-right: 20px;">GWHBDNP00000004</td>
+      <td style="padding-right: 20px;">Chromosome 4</td>
+      <td style="padding-right: 20px;">Complete=F</td>
+      <td style="padding-right: 20px;">Circular=F</td>
+      <td style="padding-right: 20px;">OriSeqID=chr4</td>
+      <td>Len=22250686</td>
+    </tr>
+      <tr>
+      <td style="padding-right: 20px;">GWHBDNP00000005</td>
+      <td style="padding-right: 20px;">Chromosome 5</td>
+      <td style="padding-right: 20px;">Complete=F</td>
+      <td style="padding-right: 20px;">Circular=F</td>
+      <td style="padding-right: 20px;">OriSeqID=chr5</td>
+      <td>Len=30093473</td>
+    </tr>
+  </table>
+</div>
+
+</p>
+
+<p class="text-justify">Next, we will retain only the shortest chromosome:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code10')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code10" class="code-text">
+<pre>
+<span class="bash-keyword">awk</span> <span class="bash-option">-v</span> <span class="bash-variable">chr=4</span> <span class="bash-string">'
+BEGIN {FS="\t"} 
+$1 ~ />GWHBDNP/ &amp;&amp; $2 == "Chromosome " chr {print; flag=1; next} 
+$1 ~ />GWHBDNP/ &amp;&amp; $2 != "Chromosome " chr {flag=0} 
+flag
+'</span> <span class="bash-string">GWHBDNP00000000.genome.fasta</span> <span class="bash-operator">></span> <span class="bash-string">Arabidopsis_GWHBDNP00000000_chr4.fasta</span>
+</pre>
+  </div>
+</div>
+
+</p>
+
+<p class="text-justify">Additionally, let's **[index](https://pmbio.org/module-02-inputs/0002/04/01/Indexing/)** the reference genome:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code11')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code11" class="code-text">
+  <pre>
+<span class="bash-keyword">minimap2</span> <span class="bash-option">-d</span> <span class="bash-string">Arabidopsis_GWHBDNP00000000_index.mmi</span> <span class="bash-string">GWHBDNP00000000.genome.fasta</span>
+</pre>
+  </div>
+</div>
+
+</p>
+
+<p class="text-justify">And Chromsome 4 to speed up subsequent alignments:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code12')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code12" class="code-text">
+  <pre>
+<span class="bash-keyword">hisat2-build</span> <span class="bash-string">Arabidopsis_GWHBDNP00000000_chr4.fasta</span> <span class="bash-string">hisat2_Arabidopsis_GWHBDNP00000000_chr4</span>
+</pre>
+  </div>
+</div>
+
+### [3] Trimming and alignment
+<span style="color:black">
+<p class="text-justify">Next, we will remove adapter sequences and retain only high-quality reads.</p>
+
+#### Illumina DNA data
+<span style="color:black">
+<p class="text-justify">Trimming:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code13')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code13" class="code-text">
+  <pre>
+<span class="bash-keyword">trim_galore</span> \
+<span class="bash-option">--cores</span> <span class="bash-value">8</span> \
+<span class="bash-option">--paired</span> \
+<span class="bash-option">--quality</span> <span class="bash-value">30</span> \
+<span class="bash-option">--length</span> <span class="bash-value">100</span> \
+<span class="bash-option">--clip_R1</span> <span class="bash-value">15</span> \
+<span class="bash-option">--clip_R2</span> <span class="bash-value">15</span> \
+<span class="bash-option">--three_prime_clip_R1</span> <span class="bash-value">10</span> \
+<span class="bash-option">--three_prime_clip_R2</span> <span class="bash-value">10</span> \
+<span class="bash-option">--dont_gzip</span> \
+<span class="bash-string">CRR302670_f1.fastq.gz</span> <span class="bash-string">CRR302670_r2.fastq.gz</span>
+</pre>
+  </div>
+</div>
+</p>
+
+<p class="text-justify">Alignment (do not forget to specify the path for the 
+<span style="
+  background-color: #D9EDF7;
+  display: inline-block;
+  vertical-align: text-bottom;
+  line-height: 1.2;
+  padding: 0 5px;
+  font-size: 1em;
+">
+  <code style="
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
+    font-weight: bold; <!-- Added CSS bold -->
+  ">-x</code>
+</span>
+parameter and create the 
+<span style="
+  background-color: #D9EDF7;
+  display: inline-block;
+  vertical-align: text-bottom;
+  line-height: 1.2;
+  padding: 0 5px;
+  font-size: 1em;
+">
+  <code style="
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
+    font-weight: bold; <!-- Added CSS bold -->
+  ">Temp_samtools</code>
+</span>
+folder):</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code14')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code14" class="code-text">
+<pre><span class="bash-keyword">nohup</span> <span class="bash-keyword">sh</span> <span class="bash-value">-c</span> <span class="bash-value">'</span><span class="bash-keyword">hisat2</span> \
+<span class="bash-option">-p</span> <span class="bash-value">44</span> \
+<span class="bash-option">--reorder</span> \
+<span class="bash-option">--no-mixed</span> \
+<span class="bash-option">--no-discordant</span> \
+<span class="bash-option">--no-unal</span> \
+<span class="bash-option">--sam-no-qname-trunc</span> \
+<span class="bash-operator">-x</span> <span class="bash-string">hisat2_Arabidopsis_GWHBDNP00000000_chr4</span> \
+<span class="bash-operator">-1</span> <span class="bash-string">CRR302670_f1_val_1.fq</span> \
+<span class="bash-operator">-2</span> <span class="bash-string">CRR302670_r2_val_2.fq</span> \
+<span class="bash-option">-S</span> <span class="bash-operator">-</span> <span class="bash-operator">|</span> \
+<span class="bash-keyword">samtools</span> <span class="bash-keyword">view</span> <span class="bash-option">-@</span> <span class="bash-value">44</span> <span class="bash-option">-Sb</span> <span class="bash-option">-F</span> <span class="bash-value">4</span> <span class="bash-operator">-</span> <span class="bash-operator">|</span> \
+<span class="bash-keyword">samtools</span> <span class="bash-keyword">sort</span> <span class="bash-option">-@</span> <span class="bash-value">44</span> <span class="bash-option">-m</span> <span class="bash-value">10G</span> <span class="bash-option">-T</span> <span class="bash-string">/Temp_samtools</span> <span class="bash-option">-o</span> <span class="bash-string">DNA_Illumina_sorted.bam</span> <span class="bash-operator">-</span> <span class="bash-operator">&&</span> \
+<span class="bash-keyword">samtools</span> <span class="bash-keyword">fastq</span> <span class="bash-option">-@</span> <span class="bash-value">22</span> \
+<span class="bash-operator">-1</span> <span class="bash-string">DNA_Illumina_chr4_R1.fastq</span> \
+<span class="bash-operator">-2</span> <span class="bash-string">DNA_Illumina_chr4_R2.fastq</span> \
+<span class="bash-string">DNA_Illumina_sorted.bam</span><span class="bash-value">'</span> <span class="bash-operator">&</span></pre>
+  </div>
+</div>
+
+</p>
+
+<span style="color:black">
+<p class="text-justify">Subsampling. We will keep only 75% of the reads:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code15')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code15" class="code-text">
+<pre>
+<span class="bash-keyword">for</span> <span class="bash-variable">suffix</span> <span class="bash-keyword">in</span> <span class="bash-string">R1</span> <span class="bash-string">R2</span>; <span class="bash-keyword">do</span>
+  <span class="bash-keyword">seqtk</span> <span class="bash-keyword">sample</span> <span class="bash-option">-s</span> <span class="bash-value">77</span> <span class="bash-string">"DNA_Illumina_chr4_${suffix}.fastq"</span> <span class="bash-value">0.75</span> <span class="bash-operator">></span> <span class="bash-string">"DNA_Illumina_chr4_subset_${suffix}.fastq"</span>
+<span class="bash-keyword">done</span>
+</pre>
+
+</div>
+</div>
+
+</p>
+
+#### Illumina RNA data
+<span style="color:black">
+<p class="text-justify">Convert the SRA files into FASTQ:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code16')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code16" class="code-text">
+  <pre>
+<span class="bash-keyword">for</span> <span class="bash-variable">srr_id</span> <span class="bash-keyword">in</span> <span class="bash-string">SRR3581706</span> <span class="bash-string">SRR3581708</span> <span class="bash-string">SRR3581693</span> <span class="bash-string">SRR3581681</span> <span class="bash-string">SRR3581356</span> <span class="bash-string">SRR3581705</span> <span class="bash-string">SRR3581703</span>; <span class="bash-keyword">do</span>
+  <span class="bash-keyword">fasterq-dump</span> <span class="bash-option">--threads</span> <span class="bash-value">44</span> <span class="bash-option">--split-files</span> <span class="bash-string">"$srr_id"</span>
+<span class="bash-keyword">done</span>
+</pre>
+  </div>
+</div>
+
+</p>
+
+<span style="color:black">
+<p class="text-justify">Trimming:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code17')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code17" class="code-text">
+  <pre>
+<span class="bash-keyword">parallel</span> <span class="bash-option">-j</span> <span class="bash-value">4</span> <span class="bash-keyword">"nohup trim_galore</span> <span class="bash-option">-q 20 --cores 4</span> <span class="bash-string">{}.fastq</span> <span class="bash-keyword">></span> <span class="bash-string">{}_trim.log</span> <span class="bash-keyword">2>&1 &"</span> \
+<span class="bash-operator">:::</span> <span class="bash-string">SRR3581706</span> <span class="bash-string">SRR3581708</span> <span class="bash-string">SRR3581693</span> <span class="bash-string">SRR3581681</span> <span class="bash-string">SRR3581356</span> <span class="bash-string">SRR3581705</span> <span class="bash-string">SRR3581703</span>
+</pre>
+  </div>
+</div>
+
+</p>
+
+<p class="text-justify">Alignment (do not forget to specify the path for the 
+<span style="
+  background-color: #D9EDF7;
+  display: inline-block;
+  vertical-align: text-bottom;
+  line-height: 1.2;
+  padding: 0 5px;
+  font-size: 1em;
+">
+  <code style="
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
+    font-weight: bold; <!-- Added CSS bold -->
+  ">-x</code>
+</span>
+parameter): 
+</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code18')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code18" class="code-text">
+  
+<pre><span class="bash-variable">SAMPLES</span><span class="bash-operator">=(</span><span class="bash-string">SRR3581706</span> <span class="bash-string">SRR3581708</span> <span class="bash-string">SRR3581693</span> <span class="bash-string">SRR3581681</span> <span class="bash-string">SRR3581356</span> <span class="bash-string">SRR3581705</span> <span class="bash-string">SRR3581703</span><span class="bash-operator">)</span>
+<span class="bash-keyword">for</span> <span class="bash-variable">SAMPLE</span> <span class="bash-keyword">in</span> <span class="bash-string">"</span><span class="bash-operator">${</span><span class="bash-variable">SAMPLES</span><span class="bash-operator">[@]</span><span class="bash-string">}"</span>; <span class="bash-keyword">do</span>
+  <span class="bash-keyword">nohup</span> <span class="bash-keyword">bash</span> <span style="color: white;"><span class="bash-option">-c</span> <span class="bash-option">"</span>
+  <span class="bash-keyword">hisat2</span> <span style="color: white;"><span class="bash-option">-p</span> <span class="bash-value">12</span> <span class="bash-option">--no-unal</span> <span class="bash-option">--sam-no-qname-trunc</span> \
+  <span class="bash-keyword">-x</span> <span class="bash-string">hisat2_Arabidopsis_GWHBDNP00000000_chr4</span> \
+  <span class="bash-option">--rna-strandness</span> <span class="bash-option">F</span> \
+  <span class="bash-option">-U</span> '<span class="bash-operator">${</span><span class="bash-variable">SAMPLE</span><span class="bash-operator">}</span><span class="bash-string">_trimmed.fq</span>' \
+  <span class="bash-option">-S</span> '<span class="bash-operator">${</span><span class="bash-variable">SAMPLE</span><span class="bash-operator">}</span><span class="bash-string">.sam</span>' <span class="bash-operator">&&</span> \
+  <span class="bash-keyword">samtools</span> <span class="bash-keyword">view</span> <span class="bash-option">-@</span> <span class="bash-value">12</span> <span class="bash-option">-Sb</span> <span class="bash-option">-F</span> <span class="bash-value">4</span> <span class="bash-option">-q</span> <span class="bash-value">20</span> '<span class="bash-operator">${</span><span class="bash-variable">SAMPLE</span><span class="bash-operator">}</span><span class="bash-string">.sam</span>' <span class="bash-operator">></span> '<span class="bash-operator">${</span><span class="bash-variable">SAMPLE</span><span class="bash-operator">}</span><span class="bash-string">.bam</span>' <span class="bash-operator">&&</span> \
+  <span class="bash-keyword">samtools</span> <span class="bash-keyword">sort</span> <span class="bash-option">-@</span> <span class="bash-value">12</span> <span class="bash-option">-m</span> <span class="bash-value">10G</span> <span class="bash-option">-o</span> '<span class="bash-operator">${</span><span class="bash-variable">SAMPLE</span><span class="bash-operator">}</span><span class="bash-string">_RNA_Illumina_chr4_subset.bam</span>' '<span class="bash-operator">${</span><span class="bash-variable">SAMPLE</span><span class="bash-operator">}</span><span class="bash-string">.bam</span>' <span class="bash-operator">&&</span> \
+  <span class="bash-keyword">samtools</span> <span class="bash-keyword">fastq</span> <span class="bash-option">-@</span> <span class="bash-value">12</span> '<span class="bash-operator">${</span><span class="bash-variable">SAMPLE</span><span class="bash-operator">}</span><span class="bash-string">_RNA_Illumina_chr4_subset.bam</span>' <span class="bash-operator">></span> '<span class="bash-operator">${</span><span class="bash-variable">SAMPLE</span><span class="bash-operator">}</span><span class="bash-string">_RNA_Illumina_chr4_subset.fastq</span>' <span class="bash-operator">&&</span> \
+  <span class="bash-keyword">rm</span> <span class="bash-option">-f</span> '<span class="bash-operator">${</span><span class="bash-variable">SAMPLE</span><span class="bash-operator">}</span><span class="bash-string">.sam</span>' '<span class="bash-operator">${</span><span class="bash-variable">SAMPLE</span><span class="bash-operator">}</span><span class="bash-string">.bam</span>'
+  "</span> <span class="bash-operator">></span> <span class="bash-string">"</span><span class="bash-operator">${</span><span class="bash-variable">SAMPLE</span><span class="bash-operator">}</span><span class="bash-string">.log"</span> <span class="bash-operator">2>&1</span> <span class="bash-operator">&</span>
+<span class="bash-keyword">done</span></pre>
+
+</div>
+</div>
+
+</p>
+
+#### Illumina Hi-C data
+<span style="color:black">
+<p class="text-justify">Trimming:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code19')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code19" class="code-text">
+<pre>
+<span class="bash-keyword">trim_galore</span> \
+<span class="bash-option">--cores</span> <span class="bash-value">8</span> \
+<span class="bash-option">--paired</span> \
+<span class="bash-option">--quality</span> <span class="bash-value">30</span> \
+<span class="bash-option">--length</span> <span class="bash-value">100</span> \
+<span class="bash-option">--clip_R1</span> <span class="bash-value">15</span> \
+<span class="bash-option">--clip_R2</span> <span class="bash-value">15</span> \
+<span class="bash-option">--three_prime_clip_R1</span> <span class="bash-value">10</span> \
+<span class="bash-option">--three_prime_clip_R2</span> <span class="bash-value">10</span> \
+<span class="bash-option">--dont_gzip</span> \
+<span class="bash-string">CRR302669_f1.fastq.gz</span> <span class="bash-string">CRR302669_r2.fastq.gz</span>
+</pre>
+</div>
+</div>
+
+</p>
+
+</p>
+
+<p class="text-justify">Alignment (do not forget to specify the path for the 
+<span style="
+  background-color: #D9EDF7;
+  display: inline-block;
+  vertical-align: text-bottom;
+  line-height: 1.2;
+  padding: 0 5px;
+  font-size: 1em;
+">
+  <code style="
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
+    font-weight: bold; <!-- Added CSS bold -->
+  ">-x</code>
+</span>
+parameter and create the 
+<span style="
+  background-color: #D9EDF7;
+  display: inline-block;
+  vertical-align: text-bottom;
+  line-height: 1.2;
+  padding: 0 5px;
+  font-size: 1em;
+">
+  <code style="
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
+    font-weight: bold; <!-- Added CSS bold -->
+  ">Temp_samtools</code>
+</span>
+folder):</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code20')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code20" class="code-text">
+<pre><span class="bash-keyword">nohup</span> <span class="bash-keyword">sh</span> <span class="bash-operator">-c</span> <span class="bash-option">'<span class="bash-keyword">hisat2</span> <span style="color: white;"><span class="bash-option">-p</span> <span class="bash-value">22</span> <span class="bash-option">--reorder</span> <span class="bash-option">--no-mixed</span> <span class="bash-option">--no-discordant</span> <span class="bash-option">--no-unal</span> <span class="bash-option">--sam-no-qname-trunc</span> \
+<span class="bash-option">--no-spliced-alignment</span> \
+<span class="bash-keyword">-x</span> <span class="bash-string">hisat2_Arabidopsis_GWHBDNP00000000_chr4</span> \
+<span class="bash-keyword">-1</span> <span class="bash-string">CRR302669_f1_val_1.fq</span> \
+<span class="bash-keyword">-2</span> <span class="bash-string">CRR302669_r2_val_2.fq</span> \
+<span class="bash-option">-S</span> <span class="bash-operator">-</span> <span class="bash-operator">|</span> \
+<span class="bash-keyword">samtools</span> <span class="bash-keyword">view</span> <span class="bash-option">-@</span> <span class="bash-value">22</span> <span class="bash-option">-Sb</span> <span class="bash-option">-F</span> <span class="bash-value">4</span> <span class="bash-operator">-</span> <span class="bash-operator">|</span> \
+<span class="bash-keyword">samtools</span> <span class="bash-keyword">sort</span> <span class="bash-option">-n</span> <span class="bash-option">-@</span> <span class="bash-value">22</span> <span class="bash-option">-m</span> <span class="bash-value">10G</span> <span class="bash-option">-T</span> <span class="bash-string">/Temp_samtools</span> <span class="bash-option">-o</span> <span class="bash-string">Hi_C_Illumina_chr4.bam</span> <span class="bash-operator">-</span> <span class="bash-operator">&&</span> \
+<span class="bash-keyword">samtools</span> <span class="bash-keyword">fastq</span> <span class="bash-option">-@</span> <span class="bash-value">22</span> \
+<span class="bash-keyword">-1</span> <span class="bash-string">Hi_C_Illumina_chr4_R1.fastq</span> \
+<span class="bash-keyword">-2</span> <span class="bash-string">Hi_C_Illumina_chr4_R2.fastq</span> \
+<span class="bash-string">Hi_C_Illumina_chr4.bam</span>'</span> <span class="bash-operator">&</span></pre>
+</div>
+</div>
+
+</p>
+
+#### PacBio HiFi data
+<span style="color:black">
+<p class="text-justify">Trimming:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code21')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code21" class="code-text">
+<pre>
+<span class="bash-keyword">cutadapt</span> \
+<span class="bash-option">-j</span> <span class="bash-value">20</span> \
+<span class="bash-option">-a</span> <span class="bash-string">"AATGTACTTCGTTCAGTTACGTATTGCT"</span> \
+<span class="bash-option">-a</span> <span class="bash-string">"AGAGTACATGGGAGTTGGTTATGGTAAT"</span> \
+<span class="bash-option">--quality-cutoff</span> <span class="bash-value">30</span> \
+<span class="bash-option">-m</span> <span class="bash-value">5000</span> \
+<span class="bash-option">-M</span> <span class="bash-value">30000</span> \
+<span class="bash-option">-o</span> <span class="bash-string">HiFi_trimmed.fastq.gz</span> \
+<span class="bash-string">CRR302668.fastq.gz</span>
+</pre>
+</div>
+</div>
+
+</p>
+
+<p class="text-justify">Alignment (do not forget to create the 
+<span style="
+  background-color: #D9EDF7;
+  display: inline-block;
+  vertical-align: text-bottom;
+  line-height: 1.2;
+  padding: 0 5px;
+  font-size: 1em;
+">
+  <code style="
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
+    font-weight: bold; <!-- Added CSS bold -->
+  ">Temp_samtools</code>
+</span>
+:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code22')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code22" class="code-text">
+  <pre>
+<span class="bash-keyword">minimap2</span> <span class="bash-option">-ax</span> <span class="bash-option">map-hifi</span> <span class="bash-option">-t</span> <span class="bash-value">44</span></span> <span class="bash-string">Arabidopsis_GWHBDNP00000000_chr4.fasta</span></span> <span class="bash-string">HiFi_trimmed.fastq.gz</span></span> <span class="bash-operator">|</span> \
+<span class="bash-keyword">samtools</span> <span class="bash-keyword">view</span> <span class="bash-option">-@</span> <span class="bash-value">22</span> <span class="bash-option">-Sb</span> <span class="bash-option">-F</span> <span class="bash-value">4</span> <span class="bash-option">-F</span> <span class="bash-value">256</span> <span class="bash-option">-F</span> <span class="bash-value">2048</span> <span class="bash-option">-q</span> <span class="bash-value">50</span></span> <span class="bash-operator">|</span> \
+<span class="bash-keyword">samtools</span> <span class="bash-keyword">sort</span> <span class="bash-option">-@</span> <span class="bash-value">22</span> <span class="bash-option">-m</span> <span class="bash-value">10G</span> <span class="bash-option">-T</span> <span class="bash-string">/Temp_samtools</span> <span class="bash-option">-o</span></span> <span class="bash-string">HiFi_chr4.bam</span> <span class="bash-operator">-</span> <span class="bash-operator">&&</span> \
+<span class="bash-keyword">samtools</span> <span class="bash-keyword">fastq</span> <span class="bash-option">-@</span> <span class="bash-value">22</span></span> <span class="bash-string">HiFi_chr4.bam</span> <span class="bash-operator">></span> <span class="bash-string">HiFi_chr4.fastq</span>
+</pre>
+</div>
+</div>
+
+</p>
+
+<span style="color:black">
+<p class="text-justify">Subsampling. We will keep only 75% of the reads:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code23')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code23" class="code-text">
+  <pre>
+<span class="bash-keyword">seqtk</span> <span class="bash-keyword">sample</span> <span class="bash-option">-s</span> <span class="bash-value">77</span> <span class="bash-string">HiFi_chr4.fastq</span> <span class="bash-value">0.75</span> <span class="bash-operator">></span> <span class="bash-string">HiFi_chr4_subset.fastq</span>
+</pre>
+  </div>
+</div>
+
+</p>
+
+#### ONT data
+<span style="color:black">
+<p class="text-justify">Trimming:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code24')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code24" class="code-text">
+  <pre>
+<span class="bash-keyword">porechop</span> <span class="bash-value">--threads 44</span> <span class="bash-value">-i</span> <span class="bash-string">CRR302667.fastq.gz</span> <span class="bash-value">-o</span> <span class="bash-string">ONT_trimmed.fastq.gz</span>
+</pre>
+  </div>
+</div>
+
+</p>
+
+<p class="text-justify">Correction. Since aligning with uncorrected ONT reads might not be the best approach, we first correct them using 
+<span style="
+  background-color: #D9EDF7;
+  display: inline-block;
+  vertical-align: text-bottom;
+  line-height: 1.2;
+  padding: 0 5px;
+  font-size: 1em;
+">
+  <code style="
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
+    font-weight: bold; <!-- Added CSS bold -->
+  ">NECAT</code>
+</span>
+by creating an 
+<span style="
+  background-color: #D9EDF7;
+  display: inline-block;
+  vertical-align: text-bottom;
+  line-height: 1.2;
+  padding: 0 5px;
+  font-size: 1em;
+">
+  <code style="
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
+    font-weight: bold; <!-- Added CSS bold -->
+  ">arabidopsis_config.txt</code>
+</span>
+file, where
+<span style="
+  background-color: #D9EDF7;
+  display: inline-block;
+  vertical-align: text-bottom;
+  line-height: 1.2;
+  padding: 0 5px;
+  font-size: 1em;
+">
+  <code style="
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
+    font-weight: bold; <!-- Added CSS bold -->
+  ">read_list.txt</code>
+</span>
+specifies the path to
+<span style="
+  background-color: #D9EDF7;
+  display: inline-block;
+  vertical-align: text-bottom;
+  line-height: 1.2;
+  padding: 0 5px;
+  font-size: 1em;
+">
+  <code style="
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
+    font-weight: bold; <!-- Added CSS bold -->
+  ">ONT_trimmed.fastq.gz</code>
+</span>:</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<font size="2">
+<span style="color:black">
+PROJECT=Arabidopsis<br/>
+ONT_READ_LIST=read_list.txt<br/>
+GENOME_SIZE=135000000<br/>
+THREADS=44<br/>
+MIN_READ_LENGTH=10000<br/>
+PREP_OUTPUT_COVERAGE=40<br/>
+OVLP_FAST_OPTIONS=-n 500 -z 20 -b 2000 -e 0.5 -j 0 -u 1 -a 1000<br/>
+OVLP_SENSITIVE_OPTIONS=-n 500 -z 10 -e 0.5 -j 0 -u 1 -a 1000<br/>
+CNS_FAST_OPTIONS=-a 2000 -x 4 -y 12 -l 1000 -e 0.5 -p 0.8 -u 0<br/>
+CNS_SENSITIVE_OPTIONS=-a 2000 -x 4 -y 12 -l 1000 -e 0.5 -p 0.8 -u 0<br/>
+TRIM_OVLP_OPTIONS=-n 100 -z 10 -b 2000 -e 0.5 -j 1 -u 1 -a 400<br/>
+ASM_OVLP_OPTIONS=-n 100 -z 10 -b 2000 -e 0.5 -j 1 -u 0 -a 400<br/>
+NUM_ITER=2<br/>
+CNS_OUTPUT_COVERAGE=40<br/>
+CLEANUP=1<br/>
+USE_GRID=false<br/>
+GRID_NODE=0<br/>
+GRID_OPTIONS=<br/>
+SMALL_MEMORY=0<br/>
+FSA_OL_FILTER_OPTIONS=<br/>
+FSA_ASSEMBLE_OPTIONS=<br/>
+FSA_CTG_BRIDGE_OPTIONS=<br/>
+POLISH_CONTIGS=true<br/>
+</span>
+</font>
+</div>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code25')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code25" class="code-text">
+  <pre>
+<span class="bash-keyword">necat</span> <span class="bash-option">correct</span> <span class="bash-string">arabidopsis_config.txt</span>
+</pre>
+  </div>
+</div>
+
+</p>
+
+<span style="color:black">
+<p class="text-justify">Alignment with corrected reads to the reference genome:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code26')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code26" class="code-text">
+  <pre>
+<span class="bash-keyword">minimap2</span> <span class="bash-option">-ax</span> <span class="bash-option">map-ont</span> <span class="bash-option">-t</span> <span class="bash-value">44</span> <span class="bash-string">GWHBDNP00000000.genome.fasta</span> <span class="bash-string">cns_final.fasta.gz</span> <span class="bash-operator">|</span> \
+<span class="bash-keyword">samtools</span> <span class="bash-keyword">sort</span> <span class="bash-option">-@</span> <span class="bash-value">44</span> <span class="bash-option">-o</span> <span class="bash-string">full_align.bam</span>
+</pre>
+</div>
+</div>
+
+</p>
+
+<span style="color:black">
+<p class="text-justify">Index the bam file:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code27')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code27" class="code-text">
+  <pre>
+<span class="bash-keyword">samtools</span> <span class="bash-keyword">index</span> <span class="bash-string">full_align.bam</span>
+</pre>
+  </div>
+</div>
+
+</p>
+
+<span style="color:black">
+<p class="text-justify">Extract reads mapping uniquely to Chromosome 4:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code28')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code28" class="code-text">
+  <pre>
+<span class="bash-keyword">samtools</span> <span class="bash-keyword">view</span> <span class="bash-option">-@</span> <span class="bash-value">22</span></span> <span class="bash-option">-b</span></span> <span class="bash-option">-q</span> <span class="bash-value">20</span></span> <span class="bash-option">-F</span> <span class="bash-value">256</span></span> <span class="bash-option">-F</span> <span class="bash-value">2048</span></span> <span class="bash-string">full_align.bam</span> <span class="bash-string">"GWHBDNP00000004"</span></span> <span class="bash-option">-o</span> <span class="bash-string">ONT_chr4.bam</span>
+</pre>
+  </div>
+</div>
+
+</p>
+
+<span style="color:black">
+<p class="text-justify">And convert BAM to FASTQ:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code29')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code29" class="code-text">
+  <pre>
+<span class="bash-keyword">samtools</span> <span class="bash-keyword">fastq</span> <span class="bash-option">-@</span> <span class="bash-value">22</span></span> <span class="bash-string">ONT_chr4.bam</span></span> <span class="bash-operator">></span> <span class="bash-string">ONT_chr4.fastq</span>
+</pre>
+  </div>
+</div>
+
+</p>
+
+### [4] Sabsampling for the QC chapter 
+#### Illumina DNA data
+<span style="color:black">
+<p class="text-justify">Let’s keep only 5% of the reads for downstream quality checks:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code30')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code30" class="code-text">
+  <pre>
+<span class="bash-keyword">seqtk</span> <span class="bash-keyword">sample</span> <span class="bash-option">-s</span> <span class="bash-value">11</span></span> <span class="bash-string">CRR302670_f1.fastq.gz</span></span> <span class="bash-value">0.05</span></span> <span class="bash-operator">|</span> <span class="bash-keyword">gzip</span> <span class="bash-operator">></span> <span class="bash-string">DNA_Illumina_QC.fastq.gz</span>
+</pre>
+  </div>
+</div>
+
+#### PacBio HiFi data
+<span style="color:black">
+<p class="text-justify">We retain only 1% of the reads:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code31')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code31" class="code-text">
+  <pre>
+<span class="bash-keyword">seqtk</span> <span class="bash-keyword">sample</span> <span class="bash-option">-s</span> <span class="bash-value">77</span></span> <span class="bash-string">CRR302668.fastq.gz</span></span> <span class="bash-value">0.01</span></span> <span class="bash-operator">|</span> <span class="bash-keyword">gzip</span> <span class="bash-operator">></span> <span class="bash-string">HiFi_QC.fastq.gz</span>
+</pre>
+  </div>
+</div>
+
+#### ONT data
+<span style="color:black">
+<p class="text-justify">Here, we also retain only 1% of the reads:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code32')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code32" class="code-text">
+  <pre>
+<span class="bash-keyword">seqtk</span> <span class="bash-keyword">sample</span> <span class="bash-option">-s</span> <span class="bash-value">77</span></span> <span class="bash-string">CRR302667.fastq.gz</span></span> <span class="bash-value">0.01</span></span> <span class="bash-operator">|</span> <span class="bash-keyword">gzip</span> <span class="bash-operator">></span> <span class="bash-string">ONT_QC.fastq.gz</span>
+</pre>
+  </div>
+</div>
+
+# [III] Genome assembly
+## Recap
+<span style="color:black">
+<p class="text-justify">Genome assembly is like rebuilding the Great Wall. The original wall is unique, but it has many identical sections (such as watchtowers and repeating brick patterns) repeated along its length. If you break the wall into tiny pieces (similar to how DNA is fragmented during sequencing), rebuilding it perfectly becomes challenging because repeating structures make it difficult to determine how the pieces fit together. To solve this, we can use different sequencing technologies:</p>
+
+(1) Illumina (short reads): provides highly accurate details of small fragments (like individual bricks). However, it struggles with long repetitive sections (e.g., repeated watchtowers), leaving gaps in the reconstruction.
+(2) PacBio HiFi (long reads): captures longer sequences and can bridge many repetitive regions. However, it may still fail to resolve extremely long identical sections (e.g., massive fortress-like structures).
+(3) ONT PromethION (ultra-long reads): spans entire sections of the wall, revealing how large repeating structures are connected. Drawback: these reads have more errors and need fixing.</p>
+
+**Goal**: Rebuild the Great Wall (genome) exactly as it was, with no misplaced bricks.
+
+**Solution**: use ultra-long reads (ONT) to map how giant repeating sections connect; refine the structure with long reads (HiFi) and short reads (Illumina) to fix errors and ensure every brick is in the right place (**Figure 1**).</p>
+
+```{=html}
+<img src="E:/Work_place_XTBG_China/Tutorial_XTBG_2025/Tutorial/Genome_Assembly_XTBG_2025/Fig_1.svg" style="width: 100%; height: auto; border: 1px solid #ddd; border-radius: 10px;">
+```
+<span style="color:black">
+<p class="text-center">**Figure 1**. Overview of the sequencing technologies used in this tutorial.</p>
+</p>
+
+<span style="color:black">
+<p class="text-justify">Here, we will use a hybrid genome assembly pipeline, as illustrated in **Figure 2**.</p>
+
+```{=html}
+<img src="E:/Work_place_XTBG_China/Tutorial_XTBG_2025/Tutorial/Genome_Assembly_XTBG_2025/Fig_2.svg" style="width: 100%; height: auto; border: 1px solid #ddd; border-radius: 10px;">
+```
+<span style="color:black">
+<p class="text-center">**Figure 2**. Key steps in the hybrid genome assembly pipeline.</p>
+
+
+## Quality check
+
+### Short-Read Sequencing
+<span style="color:black">
+<p class="text-justify">Let’s perform a quick quality check using Illumina DNA reads:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code33')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code33" class="code-text">
+  <pre>fastqc DNA_Illumina_QC.fastq.gz</pre></div>
+</div>
+
+</p>
+
+<span style="color:black">
+<p class="text-justify">And check the resulted file
+<span style="
+  background-color: #D9EDF7;
+  display: inline-block;
+  vertical-align: text-bottom;
+  line-height: 1.2;
+  padding: 0 5px;
+  font-size: 1em;
+">
+  <code style="
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
+    font-weight: bold; <!-- Added CSS bold -->
+  ">DNA_Illumina_QC_fastqc.html</code>
+</span>
+(**Figure 3**):</p>
+
+```{r, echo=FALSE}
+htmltools::tags$div(
+  style = "width: 100%; overflow: hidden; margin: 0; padding: 0;",
+  htmltools::tags$div(
+    style = "
+      transform: scale(0.85);
+      transform-origin: 0 0;
+      width: 977px;
+      height: 800px;
+      /* Remove or reduce negative margin */
+      margin-bottom: -100px;
+    ",
+    htmltools::tags$iframe(
+      title = "DNA_Illumina_QC_fastqc.html",
+      src = "E:/Work_place_XTBG_China/Tutorial_XTBG_2025/Tutorial/Genome_Assembly_XTBG_2025/Fig_3_DNA_Illumina_QC_fastqc.html",
+      style = "
+        border: none;
+        outline: none;
+        border-radius: 10px;
+        width: 100%;
+        height: 100%;
+      "
+    )
+  ))
+```
+
+<span style="color:black">
+<p class="text-center">**Figure 3**. The FastQC output report.</p>
+</p>
+
+<span style="color:black">
+<p class="text-justify">Now, we will remove adapters (if present), set a quality threshold of 35, retain only sequences longer than 100 bases, and trim from both the 5’ and 3’ ends:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code34')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code34" class="code-text">
+  <pre>trim_galore \
+--cores 8 \
+--quality 35 \
+--length 100 \
+--clip_R1 15 \
+--three_prime_clip_R1 10 \
+DNA_Illumina_QC.fastq.gz</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`trim_galore`</span> Invokes the Trim Galore! tool (a wrapper for Cutadapt and FastQC)<br/>
+<span style="color: blue;">`--cores 8`</span> Uses **8** CPU cores for parallel processing, speeding up the trimming<br/>
+<span style="color: blue;">`--quality 35`</span> Trims bases with a Phred quality score below **35** (typical for high-quality data like Illumina)<br/>
+<span style="color: blue;">`--length 100`</span> Discards reads shorter than 100 bases after trimming<br/>
+<span style="color: blue;">`--clip_R1 15`</span> Removes **15** bases from the 5' end (start) of Read 1<br/>
+<span style="color: blue;">`--three_prime_clip_R1 10`</span> Removes **10** bases from the 3' end (end) of Read 1<br/>
+<span style="color: blue;">`DNA_Illumina_QC.fastq.gz`</span> Processes the input file: a gzipped FASTQ file (single-end Illumina reads)<br/>
+</span>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">Check the QC of the trimmed reads:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code35')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code35" class="code-text">
+  <pre>fastqc DNA_Illumina_QC_trimmed.gz</pre></div>
+</div>
+
+</p>
+
+<span style="color:black">
+<p class="text-justify">Next, check the resulted file
+<span style="
+  background-color: #D9EDF7;
+  display: inline-block;
+  vertical-align: text-bottom;
+  line-height: 1.2;
+  padding: 0 5px;
+  font-size: 1em;
+">
+  <code style="
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
+    font-weight: bold; <!-- Added CSS bold -->
+  ">DNA_Illumina_QC_trimmed_fastqc.html</code>
+</span>(**Figure 4**):</p>
+
+```{r, echo=FALSE}
+htmltools::tags$div(
+  style = "width: 100%; overflow: hidden; margin: 0; padding: 0;",
+  htmltools::tags$div(
+    style = "
+      transform: scale(0.85);
+      transform-origin: 0 0;
+      width: 977px;
+      height: 800px;
+      /* Remove or reduce negative margin */
+      margin-bottom: -100px;
+    ",
+    htmltools::tags$iframe(
+      title = "DNA_Illumina_QC_trimmed_fastqc.html",
+      src = "E:/Work_place_XTBG_China/Tutorial_XTBG_2025/Tutorial/Genome_Assembly_XTBG_2025/Fig_4_DNA_Illumina_QC_trimmed_fastqc.html",
+      style = "
+        border: none;
+        outline: none;
+        border-radius: 10px;
+        width: 100%;
+        height: 100%;
+      "
+    )
+  ))
+```
+
+<span style="color:black">
+<p class="text-center">**Figure 4**. The FastQC output report for the trimmed reads.</p>
+</p>
+
+### Long-Read Sequencing
+
+#### [1] PacBio HiFi reads
+
+<span style="color:black">
+<p class="text-justify">Here, we will check the quality of the HiFi reads:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code36')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code36" class="code-text">
+  <pre>NanoPlot --fastq HiFi_QC.fastq.gz --outdir NanoPlot_HiFi_Report</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`NanoPlot`</span> Generates plots and statistics from ONT and PacBio data (read length, quality score & more)<br/>
+<span style="color: blue;">`--fastq`</span> Specifies that the input file is in FASTQ format<br/>
+<span style="color: blue;">`HiFi_QC.fastq.gz`</span> The input file<br/>
+<span style="color: blue;">`--outdir`</span> Specifies the directory where the output files (plots, statistics, and reports) will be saved<br/>
+<span style="color: blue;">`NanoPlot_HiFi_Report`</span> The directory name<br/>
+</span>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">The resulting report appears in **Figure 5**:</p>
+
+```{r, echo=FALSE}
+htmltools::tags$div(
+  style = "width: 100%; margin: 0; padding: 0;",
+  htmltools::tags$div(
+    style = "
+      transform: scale(0.85);
+      transform-origin: 0 0;
+      width: 977px;
+      height: 800px;
+      margin-bottom: -100px;
+    ",
+    htmltools::tags$iframe(
+      title = "NanoPlot-report_HiFi.html",
+      src = "E:/Work_place_XTBG_China/Tutorial_XTBG_2025/Tutorial/Genome_Assembly_XTBG_2025/Fig_5_NanoPlot_HiFi.html",
+      style = "
+        border: none;
+        outline: none;
+        border-radius: 10px;
+        width: 100%;
+        height: 100%;
+        overflow: hidden; /* Ensure iframe content respects border-radius */
+      "
+    )
+  )
+)
+```
+
+<span style="color:black">
+<p class="text-center">**Figure 5**. The NanoPlot report output for the HiFi reads.</p>
+</p>
+
+#### [2] ONT reads
+<span style="color:black">
+<p class="text-justify">Next, we will check the quality of the ONT reads:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code37')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code37" class="code-text">
+  <pre>NanoPlot --fastq ONT_QC.fastq.gz --outdir NanoPlot_ONT_Report</pre></div>
+</div>
+
+</p>
+
+<span style="color:black">
+<p class="text-justify">The resulting report appears in **Figure 6**:</p>
+
+```{r, echo=FALSE}
+htmltools::tags$div(
+  style = "width: 100%; overflow: hidden; margin: 0; padding: 0;",
+  htmltools::tags$div(
+    style = "
+      transform: scale(0.85);
+      transform-origin: 0 0;
+      width: 977px;        
+      height: 800px;       
+      margin-bottom: -100px;
+    ",
+    htmltools::tags$iframe(
+      title = "NanoPlot_ONT_Report",
+      src = "E:/Work_place_XTBG_China/Tutorial_XTBG_2025/Tutorial/Genome_Assembly_XTBG_2025/Fig_6_NanoPlot_ONT.html",
+      style = "
+        border: none;
+        outline: none;
+        border-radius: 10px;
+        width: 100%;
+        height: 100%;
+      "
+    )
+  ))
+```
+
+<span style="color:black">
+<p class="text-center">**Figure 6**. The NanoPlot report output for the ONT reads.</p>
+</p>
+
+## Assembly with a reference genome
+### [1] Flye
+<span style="color:black">
+<p class="text-justify">We will use the
+<span style="
+  background-color: #D9EDF7;
+  display: inline-block;
+  vertical-align: text-bottom;
+  line-height: 1.2;
+  padding: 0 5px;
+  font-size: 1em;
+">
+  <code style="
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
+    font-weight: bold; <!-- Added CSS bold -->
+  ">Flye</code>
+</span>:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code38')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code38" class="code-text">
+  <pre>flye --nano-corr ONT_chr4.fastq \
+--out-dir Flye_assembly_chr4 \
+--genome-size 22m \
+--min-overlap 5000 \
+--iterations 3 \
+--threads 88</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`flye`</span> Invokes the Flye assembler<br/>
+<span style="color: blue;">`--nano-corr`</span> Specifies that the input is error-corrected Nanopore reads<br/>
+<span style="color: blue;">`ONT_chr4.fastq`</span> Input file containing sequencing reads<br/>
+<span style="color: blue;">`--out-dir Flye_assembly_chr4`</span> Output directory for assembly results (contigs, logs, etc.)<br/>
+<span style="color: blue;">`--genome-size 22m`</span> Estimated genome size is 22 million bases<br/>
+<span style="color: blue;">`--min-overlap 5000`</span> Requires a minimum overlap of 5,000 bases between reads to form contigs<br/>
+<span style="color: blue;">`--iterations 3`</span> Runs 3 polishing iterations to refine the assembly (improves accuracy but increases runtime)<br/>
+<span style="color: blue;">`--threads 88`</span> Uses 88 CPU threads for parallel processing<br/>
+</span>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">Next, we will index the output file:</span>
+
+</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code39')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code39" class="code-text">
+  <pre>samtools faidx assembly.fasta</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`samtools`</span> A set of tools for manipulating next-generation sequencing data<br/>
+<span style="color: blue;">`faidx`</span> Subcommand for indexing FASTA files<br/>
+<span style="color: blue;">`assembly.fasta`</span> The input FASTA file<br/>
+</span>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">And check the content:</span>
+
+</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code40')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code40" class="code-text">
+  <pre>cut -f1,2 assembly.fasta.fai</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`cut`</span> Unix utility to extract specific columns from a text file<br/>
+<span style="color: blue;">`-f1,2`</span> Specifies that columns 1 and 2 should be extracted<br/>
+<span style="color: blue;">`assembly.fasta.fai`</span> The input file<br/>
+</span>
+</font>
+</div>
+
+<p class="text-justify">It should look like this:</p>
+
+<div class="alert alert-info" style="display: flex; align-items: flex-start; min-height: 100px; padding: 15px; border-radius: 10px; font-family: monospace;">
+  <table style="color: black; border-collapse: collapse; text-align: left;">
+    <tr>
+      <td style="padding-right: 20px;">contig_10</td>
+      <td style="padding-right: 20px;">7816</td>
+    </tr>
+    <tr>
+      <td style="padding-right: 20px;">contig_3</td>
+      <td style="padding-right: 20px;">3244749</td>
+    </tr>
+     <tr>
+      <td style="padding-right: 20px;">contig_5</td>
+      <td style="padding-right: 20px;">959609</td>
+    </tr>
+      <tr>
+      <td style="padding-right: 20px;">contig_6</td>
+      <td style="padding-right: 20px;">14850431</td>
+    </tr>
+      <tr>
+      <td style="padding-right: 20px;">contig_7</td>
+      <td style="padding-right: 20px;">12283</td>
+    </tr>
+  </table>
+</div>
+
+</p>
+
+### [2] D-Genies
+<span style="color:black">
+<p class="text-justify">When we have a reference genome, we can align these contigs alongside the reference. Let's use **[D-Genies](https://dgenies.toulouse.inra.fr/run)**, which provides a synthetic similarity overview. This software can be run either locally or online. All you need to do is provide a reference genome and your newly assembled genome. Here, we will compare
+<span style="
+  background-color: #D9EDF7;
+  display: inline-block;
+  vertical-align: text-bottom;
+  line-height: 1.2;
+  padding: 0 5px;
+  font-size: 1em;
+">
+  <code style="
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
+    font-weight: bold; <!-- Added CSS bold -->
+  ">assembly.fasta</code>
+</span>, which we obtained in the previous step, with the reference genome
+<span style="
+  background-color: #D9EDF7;
+  display: inline-block;
+  vertical-align: text-bottom;
+  line-height: 1.2;
+  padding: 0 5px;
+  font-size: 1em;
+">
+  <code style="
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
+    font-weight: bold; <!-- Added CSS bold -->
+  ">GWHBDNP00000000.genome.fasta</code>
+</span>(**Figure 7**):</p>
+
+```{r, echo=FALSE}
+htmltools::tags$div(
+  style = "width: 100%; overflow: hidden; margin: 0; padding: 0;",
+  htmltools::tags$div(
+    style = "
+      transform: scale(0.85);
+      transform-origin: 0 0;
+      width: 977px;        
+      height: 800px;       
+      margin-bottom: -100px;
+    ",
+    htmltools::tags$iframe(
+      title = "Dgenies_Chr4_vs_GWHBDNP00000000.html",
+      src = "E:/Work_place_XTBG_China/Tutorial_XTBG_2025/Tutorial/Genome_Assembly_XTBG_2025/Fig_7_Dgenies_Chr4_vs_GWHBDNP00000000.html",
+      style = "
+        border: none;
+        outline: none;
+        border-radius: 10px;
+        width: 100%;
+        height: 100%;
+      "
+    )
+  ))
+```
+
+<span style="color:black">
+<p class="text-center">**Figure 7**. Synthetic similarities produced by D-Genies: Reference vs Flye genome.</p>
+</p>
+
+<span style="color:black">
+<p class="text-justify">How do we interpret these dot plots or synthetic similarities? **Figure 8** summarises the main scenarios using an analogy with the English alphabet.
+
+```{=html}
+<img src="E:/Work_place_XTBG_China/Tutorial_XTBG_2025/Tutorial/Genome_Assembly_XTBG_2025/Fig_8_Dot_plots.svg" style="width: 100%; height: auto; border: 1px solid #ddd; border-radius: 10px;">
+```
+<span style="color:black">
+<p class="text-center">**Figure 8**. Dot plot interpretation.</p>
+
+<span style="color:black">
+<p class="text-justify">Let's remove the two shortest contigs (7 and 10) by editing
+<span style="
+  background-color: #D9EDF7;
+  display: inline-block;
+  vertical-align: text-bottom;
+  line-height: 1.2;
+  padding: 0 5px;
+  font-size: 1em;
+">
+  <code style="
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
+    font-weight: bold; <!-- Added CSS bold -->
+  ">contigs_to_keep.txt</code>
+</span>
+using
+<span style="
+  background-color: #D9EDF7;
+  display: inline-block;
+  vertical-align: text-bottom;
+  line-height: 1.2;
+  padding: 0 5px;
+  font-size: 1em;
+">
+  <code style="
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
+    font-weight: bold; <!-- Added CSS bold -->
+  ">nano</code>
+  </span>:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code41')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code41" class="code-text">
+  <pre>cut -f1 assembly.fasta.fai > contigs_to_keep.txt</pre></div>
+</div>
+
+</p>
+
+<span style="color:black">
+<p class="text-justify">And running
+<span style="
+  background-color: #D9EDF7;
+  display: inline-block;
+  vertical-align: text-bottom;
+  line-height: 1.2;
+  padding: 0 5px;
+  font-size: 1em;
+">
+  <code style="
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
+    font-weight: bold; <!-- Added CSS bold -->
+  ">seqtk</code>
+  </span>:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code42')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code42" class="code-text">
+  <pre>seqtk subseq assembly.fasta contigs_to_keep.txt > assembly_3_contigs.fasta</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`seqtk`</span> Toolkit for working with sequencing data<br/>
+<span style="color: blue;">`subseq`</span> Subcommand to extract sequences based on a list of identifiers<br/>
+<span style="color: blue;">`assembly.fasta`</span> The input FASTA file<br/>
+<span style="color: blue;">`contigs_to_keep.txt`</span> The text file containing a list of sequence IDs that we want to extract from the FASTA file<br/>
+<span style="color: blue;">`>`</span> Redirects the output of the command to a new file<br/>
+<span style="color: blue;">`assembly_3_contigs.fasta`</span> The output FASTA file containing only the specified sequences<br/>
+</span>
+</font>
+</div>
+
+### [3] NextPolish
+<span style="color:black">
+<p class="text-justify">In order to improve the draft genome by identifying and correcting misassemblies and other inconsistencies, we will polish the assembly using highly accurate short and long (Illumina and HiFi) reads.</span>
+</p>
+#### [A] Alignment
+<span style="color:black">
+<p class="text-justify">Here, we will align the HiFi reads on the draft assembly:</span>
+</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code43')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code43" class="code-text">
+  <pre>minimap2 -ax map-hifi -t 10 assembly_3_contigs.fasta HiFi_chr4_subset.fastq.gz | \
+samtools sort -o hifi.map.sort.bam - && \
+samtools index hifi.map.sort.bam</pre></div>
+</div>
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`minimap2`</span> Ultrafast sequence aligner for long reads<br/>
+<span style="color: blue;">`-ax`</span> Forces minimap2 to output in SAM format and defines parameters optimised for specific data types<br/>
+<span style="color: blue;">`map-hifi`</span> Preset optimized for PacBio HiFi reads<br/>
+<span style="color: blue;">`-t 10`</span> Specifies 10 CPU threads for parallel alignment<br/>
+<span style="color: blue;">`assembly_3_contigs.fasta`</span> Reference genome<br/>
+<span style="color: blue;">`HiFi_chr4_subset.fastq.gz`</span> HiFi reads<br/>
+<span style="color: blue;">`|`</span> Indicates that output SAM-formatted alignments are streamed to the next command<br/>
+<span style="color: blue;">`samtools`</span> A set of tools for manipulating next-generation sequencing data<br/>
+<span style="color: blue;">`sort`</span> Sorts alignments by genomic coordinates<br/>
+<span style="color: blue;">`-o`</span> Indicates the output file<br/>
+<span style="color: blue;">`hifi.map.sort.bam`</span> The output file<br/>
+<span style="color: blue;">`-`</span> Takes input from stdin (the SAM data piped from minimap2)<br/>
+<span style="color: blue;">`&&`</span> Ensures that the next command (samtools index) is executed only if the previous command (samtools sort) succeeds<br/>
+<span style="color: blue;">`index`</span> Creates an index file for the sorted BAM file<br/>
+<span style="color: blue;">`hifi.map.sort.bam`</span> The output file (from the previous steps) and the input file for indexing<br/>
+</span>
+</font>
+</div>
+
+</p>
+
+#### [B] K-mer dataset
+<span style="color:black">
+<p class="text-justify">Next, we will prepare two k-mer datasets by breaking Illumina reads into smaller pieces (k-mers). These k-mers can further improve the quality of our genome assembly by identifying and correcting errors such as sequencing mistakes or misassemblies:</span>
+</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code44')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code44" class="code-text">
+  <pre>yak count -o k21.yak -k 21 -b 37 <(zcat DNA_Illumina_chr4_subset_R*.fastq.gz) <(zcat DNA_Illumina_chr4_subset_R*.fastq.gz) &
+yak count -o k31.yak -k 31 -b 37 <(zcat DNA_Illumina_chr4_subset_R*.fastq.gz) <(zcat DNA_Illumina_chr4_subset_R*.fastq.gz)</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`yak`</span> k-mer counting tool<br/>
+<span style="color: blue;">`count`</span> Subcommand performs k-mer counting on the input reads<br/>
+<span style="color: blue;">`-o`</span> Specifies the output file<br/>
+<span style="color: blue;">`k21.yak`</span> The output name<br/>
+<span style="color: blue;">`-k 21`</span> Specifies the k-mer size<br/>
+<span style="color: blue;">`-b 37`</span> Sets the number of bits used for hashing<br/>
+<span style="color: blue;">`<(zcat DNA_Illumina_chr4_subset_R*.fastq.gz)`</span> Decompresses and streams the contents of compressed FASTQ files directly into yak<br/>
+</span>
+</font>
+</div>
+
+#### [C] Polishing
+<span style="color:black">
+<p class="text-justify">Let’s then use both types of reads to polish the assembly:</span>
+</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code45')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code45" class="code-text">
+  <pre>nextPolish2 -r -t 10 hifi.map.sort.bam assembly_3_contigs.fasta k21.yak k31.yak > NP_genome.fa</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`nextPolish2`</span> Corrects errors in the assembly<br/>
+<span style="color: blue;">`-r`</span> Specifies that the input alignment file<br/>
+<span style="color: blue;">`-t 10`</span> Specifies the number of threads to use for parallel processing<br/>
+<span style="color: blue;">`hifi.map.sort.bam`</span> The input BAM file<br/>
+<span style="color: blue;">`assembly_3_contigs.fasta`</span> The reference sequence<br/>
+<span style="color: blue;">`k21.yak k31.yak`</span> k-mer count files<br/>
+<span style="color: blue;">`NP_genome.fa`</span> The final polished sequence<br/>
+</span>
+</font>
+</div>
+
+#### [D] Final notes
+<span style="color:black">
+<p class="text-justify">Additionally, we may want to reverse contig 6:</span>
+</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code46')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code46" class="code-text">
+  <pre>samtools faidx NP_genome.fa && \
+cut -f1,2 NP_genome.fa.fai && \
+(echo "contig_6" > contig_6.txt && \
+seqtk subseq NP_genome.fa contig_6.txt | seqtk seq -r > reversed_contig_6.fa && \
+grep '^>' NP_genome.fa | cut -d' ' -f1 | tr -d '>' | grep -v "contig_6" | \
+seqtk subseq NP_genome.fa /dev/stdin > other_contigs.fa && \
+cat other_contigs.fa reversed_contig_6.fa > Final_genome_with_Reference.fa)
+</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`echo "contig_6" > contig_6.txt`</span> Creates a text file containing only Contig 6<br/>
+<span style="color: blue;">`seqtk subseq NP_genome.fa contig_6.txt`</span> Extracts Contig 6 from the genome assembly<br/>
+<span style="color: blue;">`seqtk seq -r`</span> Reverses and complements the sequence (e.g., converting ACTG to CAGT)<br/>
+<span style="color: blue;">`grep '^>' NP_genome.fa`</span> Extracts all header lines starting with <span style="color: blue;">`>`</span> from the FASTA file<br/>
+<span style="color: blue;">`cut -d' ' -f1`</span> Removes any additional information after the header (e.g., **>contig_1 info** becomes **>contig_1**)<br/>
+<span style="color: blue;">`tr -d '>'`</span> Removes the **>** symbol from the headers, leaving only the sequence names<br/>
+<span style="color: blue;">`grep -v "contig_6"`</span> Excludes Contig 6 from the list of sequence names<br/>
+<span style="color: blue;">`seqtk subseq NP_genome.fa /dev/stdin`</span> Extracts sequences directly from the previous command<br/>
+<span style="color: blue;">`> other_contigs.fa`</span> Saves the extracted sequences to a new file<br/>
+<span style="color: blue;">`cat other_contigs.fa reversed_contig_6.fa`</span> Merges the reverse-complemented Contig 6 with the remaining contigs<br/>
+<span style="color: blue;">`Final_genome_with_Reference.fa`</span> The final combined concatenated FASTA file<br/>
+</span>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">And check the final assembly with **D-Genies** (**Figure 9**):</span>
+</p>
+```{r, echo=FALSE}
+htmltools::tags$div(
+  style = "width: 100%; overflow: hidden; margin: 0; padding: 0;",
+  htmltools::tags$div(
+    style = "
+      transform: scale(0.85);
+      transform-origin: 0 0;
+      width: 977px;        
+      height: 800px;       
+      margin-bottom: -100px;
+    ",
+    htmltools::tags$iframe(
+      title = "Interactive Figure 6",
+      src = "E:/Work_place_XTBG_China/Tutorial_XTBG_2025/Tutorial/Genome_Assembly_XTBG_2025/Fig_9_NP_Dgenies_Chr4_vs_GWHBDNP00000000.html",
+      style = "
+        border: none;
+        outline: none;
+        border-radius: 10px;
+        width: 100%;
+        height: 100%;
+      "
+    )
+  ))
+```
+
+<span style="color:black">
+<p class="text-center">**Figure 9**. D-Genies: Reference vs the polished genome.</p>
+</p>
+
+## Assembly without a reference genome
+<span style="color:black">
+<p class="text-justify">
+If you have genome-wide chromatin interaction data (**[Hi-C](https://en.wikipedia.org/wiki/Hi-C_(genomic_analysis_technique))**), you can use it to scaffold contigs into chromosome-scale assemblies without requiring a reference genome.
+</p>
+
+<div class="alert alert-info" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+To further explore this workflow, the following resources are recommended:<br/>
+(1) [The Genome Assembly Cookbook](https://wixlabs-pdf-dev.appspot.com/assets/pdfjs/web/viewer.html?file=%2Fpdfproxy%3Finstance%3DMRuHq7Rbtm_dH7B5Kxt0ktj_93fQjU8G1JqRvjmpDYo.eyJpbnN0YW5jZUlkIjoiOTQwZTczNzYtYTY2My00YzA0LTlkMjctOGVlNDE4YTY5ODc3IiwiYXBwRGVmSWQiOiIxM2VlMTBhMy1lY2I5LTdlZmYtNDI5OC1kMmY5ZjM0YWNmMGQiLCJtZXRhU2l0ZUlkIjoiZjJlY2EyODAtMTQwOC00NjY5LWI5MzctYzc4ZjY4YTJiMDQ1Iiwic2lnbkRhdGUiOiIyMDIyLTA3LTE1VDE0OjM4OjQ5LjY5OVoiLCJkZW1vTW9kZSI6ZmFsc2UsImFpZCI6ImE1NGM1MmE5LTA1NDUtNDFlMi1iOGEzLTllNjgxNWEzMzQ0MSIsImJpVG9rZW4iOiI2NmUyZDFmNi1iMjZiLTBhNmQtMjQxMC00OTZiNzAwNDI4MzIiLCJzaXRlT3duZXJJZCI6IjJiOTMzMGNiLWFhMWUtNGYyOC04NjhkLWNlNGEzMDM4ZTViMCJ9%26compId%3Dcomp-jln9hwb1%26url%3Dhttps%3A%2F%2Fdocs.wixstatic.com%2Fugd%2F2b9330_fd2c3fb050d04c989fe2bb9a762c94f7.pdf&rng=1657895941130#page=1&zoom=auto,-15,800&links=true&allowPrinting=true&allowDownload=true&originalFileName=manual_180322) provides a detailed strategy for assembling chromosome-length genomes using Hi-C data.<br/>
+(2) [The Aiden Lab YouTube channel](https://www.youtube.com/c/AidenLab/videos) features instructional content on utilising [Juicebox Assembly Tools](https://github.com/aidenlab/Juicebox) for genome assembly visualisation and refinement.<br/>
+</span>
+</div>
+
+</p>
+
+<div class="alert alert-danger" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+**IMPORTANT!** Your directory structure must be correctly organised for Juicer to function. Follow [the instructions](https://github.com/aidenlab/juicer/wiki/Installation#directory-structure) closely.
+</div>        
+</span>
+
+<span style="color:black">
+<p class="text-justify">
+Further to complete the assembly please follow the steps in this **[tutorial](https://niwdoog.github.io/Genome_Assembly_Long_Reads_Hi-C/#Without_a_reference)**. 
+</p>
+
+# [IV] Genome annotation
+## Repeat identification and masking
+<span style="color:black">
+<p class="text-justify">Now, we need to identify and mask transposable elements prior to structural genome annotation.</span>
+
+### [1] RepeatModeler
+<span style="color:black">
+<p class="text-justify">We will use **[RepeatModeler](https://github.com/Dfam-consortium/RepeatModeler)**, a *de novo* Transposable Element family identification and modeling package. </p>
+First, we will create a formatted BLAST-compatible database from our genome sequence to facilitate repeat identification:</span>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code47')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code47" class="code-text">
+  <pre>BuildDatabase -name A.thaliana.DB -engine rmblast Final_genome_with_Reference.fa</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`BuildDatabase`</span> Prepares a genome sequence into a database that can be used by RepeatMasker for repeat annotation<br/>
+<span style="color: blue;">`-name A.thaliana.DB`</span> Specifies the name of the database being created<br/>
+<span style="color: blue;">`-engine rmblast`</span> Specifies the search engine to use for building the database<br/>
+<span style="color: blue;">`Final_genome_with_Reference.fa`</span> The input FASTA file<br/>
+</span>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">And identify repetitive elements in the genome without relying on existing repeat libraries:</span>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code48')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code48" class="code-text">
+  <pre>RepeatModeler -database A.thaliana.DB -engine rmblast -threads 10</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`RepeatModeler`</span> Identifies and classifies repetitive elements in genomic sequences<br/>
+<span style="color: blue;">`-database A.thaliana.DB`</span> Specifies the name of the database to analyse<br/>
+<span style="color: blue;">`-engine rmblast`</span> Specifies the search engine to use for building the database<br/>
+<span style="color: blue;">`-threads 10`</span> Specifies the number of threads (CPU cores) to use for parallel processing<br/>
+</span>
+</font>
+</div>
+
+### [2] RepeatMasker
+<span style="color:black">
+<p class="text-justify">Secondly, we will use **[RepeatMasker](https://github.com/rmhubley/RepeatMasker)** to mask the TEs identified by RepeatModeler:</span>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code49')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code49" class="code-text">
+  <pre>RepeatMasker -pa 16 -xsmall -gff -lib consensi.fa.classified Final_genome_with_Reference.fa</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`RepeatMasker`</span> Identifies and masks repetitive elements<br/>
+<span style="color: blue;">`-pa 16`</span> Specifies the number of parallel processes <br/>
+<span style="color: blue;">`-xsmall`</span> Softmasking (specifies that masked bases should be represented in lowercase instead of being replaced with N)<br/>
+<span style="color: blue;">`-gff`</span> Specifies output format (General Feature Format, GFF)<br/>
+<span style="color: blue;">`-lib consensi.fa.classified`</span> Specifies the custom repeat library to use for the analysis<br/>
+<span style="color: blue;">`Final_genome_with_Reference.fa`</span> The input FASTA file<br/>
+</span>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">Your results will be stored in a tabular file (see 
+<span style="
+  background-color: #D9EDF7;
+  display: inline-block;
+  vertical-align: text-bottom;
+  line-height: 1.2;
+  padding: 0 5px;
+  font-size: 1em;
+">
+  <code style="
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
+    font-weight: bold; <!-- Added CSS bold -->
+  ">Final_genome_with_Reference.fa.tbl</code>
+</span>):</p>
+
+
+
+<div class="alert alert-success" style="border-radius: 10px; padding: 10px; overflow-x: auto;"">
+  <pre style="color: black; background: transparent; border: none; margin: 0px 10px; padding: 0;">
+==================================================
+file name: Final_genome_with_Reference.fa
+sequences:             3
+total length:   19099067 bp  (19099067 bp excl N/X-runs)
+GC level:         36.27 %
+bases masked:    2565276 bp ( 13.43 %)
+==================================================
+               number of      length   percentage
+               elements*    occupied  of sequence
+--------------------------------------------------
+Retroelements          950       908681 bp    4.76 %
+   SINEs:                0            0 bp    0.00 %
+   Penelope:             0            0 bp    0.00 %
+   LINEs:              139        70941 bp    0.37 %
+    CRE/SLACS            0            0 bp    0.00 %
+     L2/CR1/Rex          0            0 bp    0.00 %
+     R1/LOA/Jockey       0            0 bp    0.00 %
+     R2/R4/NeSL          0            0 bp    0.00 %
+     RTE/Bov-B           0            0 bp    0.00 %
+     L1/CIN4           139        70941 bp    0.37 %
+   LTR elements:       811       837740 bp    4.39 %
+     BEL/Pao             0            0 bp    0.00 %
+     Ty1/Copia          86        53177 bp    0.28 %
+     Gypsy/DIRS1       725       784563 bp    4.11 %
+       Retroviral        0            0 bp    0.00 %
+
+DNA transposons        120        65243 bp    0.34 %
+   hobo-Activator        0            0 bp    0.00 %
+   Tc1-IS630-Pogo        0            0 bp    0.00 %
+   En-Spm                0            0 bp    0.00 %
+   MULE-MuDR            83        29184 bp    0.15 %
+   PiggyBac              0            0 bp    0.00 %
+   Tourist/Harbinger     0            0 bp    0.00 %
+   Other (Mirage,        0            0 bp    0.00 %
+    P-element, Transib)
+
+Rolling-circles         26         5940 bp    0.03 %
+
+Unclassified:         5043      1258310 bp    6.59 %
+
+Total interspersed repeats:     2232234 bp   11.69 %
+
+
+Small RNA:               0            0 bp    0.00 %
+
+Satellites:              0            0 bp    0.00 %
+Simple repeats:       5922       239827 bp    1.26 %
+Low complexity:       1499        87275 bp    0.46 %
+==================================================
+
+* most repeats fragmented by insertions or deletions
+  have been counted as one element</pre></div>
+
+
+<div class="alert alert-info" style="display: flex; border-radius: 10px;">
+<span style="color:black">Please note that the current steps of repeat identification and masking are rather simplistic, and you may want to take a closer look at a more sophisticated approach, such as the one provided by **[Dr. Daren Card](https://darencard.net/blog/2022-07-09-genome-repeat-annotation/)**.<br/>
+</span>
+</div>
+
+</p>
+
+## Structural annotation 
+<span style="color:black">
+<p class="text-justify">
+In this step, we will use **[BRAKER3](https://github.com/Gaius-Augustus/BRAKER)** to structurally annotate the assembled genome with RNA-Seq data and information from proteins of any evolutionary distance (see **Figure 10**).</p>
+
+```{=html}
+<img src="E:/Work_place_XTBG_China/Tutorial_XTBG_2025/Tutorial/Genome_Assembly_XTBG_2025/Fig_10.svg" style="width: 100%; height: auto; border: 1px solid #ddd; border-radius: 10px;">
+```
+<span style="color:black">
+<p class="text-center">**Figure 10**. A simplified scheme of **BRAKER3** pipeline with RNA and protein evidence.</p>
+
+<span style="color:black">
+<p class="text-justify">First, we need to prepare the headers of the masked genome by retaining only the contig names:</span>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code50')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code50" class="code-text">
+  <pre>sed -i 's/ start.*//' Final_genome_with_Reference.fa.masked</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`sed`</span> Editor used for text processing and manipulation<br/>
+<span style="color: blue;">`-i`</span> Edits the file in place (the changes are applied directly to the file)<br/>
+<span style="color: blue;">`'s/ start.*//'`</span> Substitutes words matching **start** following by any characters with nothing<br/>
+<span style="color: blue;">`Final_genome_with_Reference.fa.masked`</span> The input file to be modified<br/>
+</span>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">Next, we need to download the latest protein evidence for green algae and land plants compatible with **Braker3**:</span>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code51')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code51" class="code-text">
+  <pre>wget https://bioinf.uni-greifswald.de/bioinf/partitioned_odb12/Viridiplantae.fa.gz && \
+gzip -d Viridiplantae.fa.gz</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`wget`</span> Utility to download files from the web<br/>
+<span style="color: blue;">`gzip -d`</span> Decompresses the downloaded file<br/>
+<span style="color: blue;">`Viridiplantae.fa.gz`</span> The final uncompressed file<br/>
+</span>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">Additionally, we need to index the masked genome:</span>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code52')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code52" class="code-text">
+  <pre>hisat2-build Final_genome_with_Reference.fa.masked hisat2_masked_genome</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`hisat2-build`</span> Creates an index for the reference genome for fast and accurate alignment of sequencing reads<br/>
+<span style="color: blue;">`Final_genome_with_Reference.fa.masked`</span> The input genome file<br/>
+<span style="color: blue;">`hisat2_masked_genome`</span> Specifies the base name for the output index files<br/>
+</span>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">Then, we will map the RNA reads to the masked genome:</span>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code53')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code53" class="code-text">
+  <pre>for sample in SRR3581706 SRR3581708 SRR3581693 SRR3581681 SRR3581356 SRR3581705 SRR3581703; do
+    hisat2 -p 12 -x hisat2_masked_genome --rna-strandness F -U "${sample}_RNA_Illumina_chr4_subset.fastq" -S "${sample}.sam"
+done</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`for sample in ...; do ... done`</span> A loop in Bash for a list of samples (SRR3581706, SRR3581708 ..)<br/>
+<span style="color: blue;">`hisat2`</span> Aligns reads to a reference genome<br/>
+<span style="color: blue;">`-p 12`</span> Specifies the number of threads (CPU cores) to use for parallel processing<br/>
+<span style="color: blue;">`-x hisat2_masked_genome`</span> Specifies the base name of the **HISAT2** index files<br/>
+<span style="color: blue;">`--rna-strandness F`</span> Specifies the strandedness of the RNA-Seq data<br/>
+<span style="color: blue;">`-U`</span> Specifies the input FASTQ file containing single-end RNA-Seq reads<br/>
+<span style="color: blue;">`${sample}`</span> Will be replaced with the current sample ID in each iteration of the loop<br/>
+<span style="color: blue;">`-S "${sample}.sam"`</span> Specifies the output SAM file<br/>
+</span>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">Now, we will convert the .sam files into the .bam format:</span>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code54')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code54" class="code-text">
+  <pre>for sample in SRR3581706 SRR3581708 SRR3581693 SRR3581681 SRR3581356 SRR3581705 SRR3581703; do
+    samtools view --threads 16 -b -F 4 "${sample}.sam" > "${sample}.bam"
+done</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`samtools view`</span> Reads the input SAM file<br/>
+<span style="color: blue;">`--threads 16`</span> Specifies the number of threads (CPU cores) to use<br/>
+<span style="color: blue;">`-b`</span> Converts SAM to BAM<br/>
+<span style="color: blue;">`-F 4`</span> Excludes unmapped reads<br/>
+</span>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">And subsequently sort these .bam files:</span>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code55')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code55" class="code-text">
+   <pre>for sample in SRR3581706 SRR3581708 SRR3581693 SRR3581681 SRR3581356 SRR3581705 SRR3581703; do
+  samtools sort -@ 4 -m 10G "${sample}.bam" -o "${sample}_sorted.bam"
+done</pre></div>
+</div>
+ 
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`samtools sort`</span> Sorts alignments in a BAM file by genomic coordinates<br/>
+<span style="color: blue;">`-@ 4`</span> Specifies the number of threads (CPU cores) to use<br/>
+<span style="color: blue;">`-m 10G`</span> Specifies the maximum memory per thread for sorting<br/>
+</span>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">It is time to run **Braker3**:</span>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code56')">Copy</button>
+</div>
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code56" class="code-text">
+   <pre>nohup braker.pl --species=A.thaliana \
+--genome=Final_genome_with_Reference.fa.masked \
+--prot_seq=Viridiplantae.fa \
+--bam=SRR3581706_sorted.bam,SRR3581708_sorted.bam,SRR3581693_sorted.bam,SRR3581681_sorted.bam,SRR3581356_sorted.bam,SRR3581705_sorted.bam,SRR3581703_sorted.bam, \
+--threads=44 \
+--gff3 &</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`nohup`</span> Runs the command in the background<br/>
+<span style="color: blue;">`braker.pl`</span> Runs BRAKER (a gene prediction pipeline)<br/>
+<span style="color: blue;">`--species=A.thaliana`</span> Specifies the species name for which gene predictions are being generated<br/>
+<span style="color: blue;">`--genome=Final_genome_with_Reference.fa.masked`</span> Specifies the input genome file<br/>
+<span style="color: blue;">`--prot_seq=Viridiplantae.fa`</span> Specifies a FASTA file containing protein sequences<br/>
+<span style="color: blue;">`--bam=SRR3581706_sorted.bam...`</span> Specifies a comma-separated list of sorted BAM files containing RNA-Seq alignments<br/>
+<span style="color: blue;">`--threads=44`</span> Specifies the number of threads (CPU cores) to use<br/>
+<span style="color: blue;">`--gff3`</span> Requests output in **GFF3** format<br/>
+<span style="color: blue;">`&`</span> Runs the command in the background (allows you to continue using the terminal while BRAKER executes)<br/>
+</span>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">After, we need to collect some statistics on the resulted annotation:</span>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code57')">Copy</button>
+</div>
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code57" class="code-text">
+   <pre>agat_sp_statistics.pl --gff braker.gff3 -o AraTha_AGAT_stats</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`agat_sp_statistics.pl`</span> Computes various statistics about the genome annotation<br/>
+<span style="color: blue;">`--gff`</span> Specifies the input GFF3 file containing the genome annotation<br/>
+<span style="color: blue;">`braker.gff3`</span> Runs BRAKER (a gene prediction pipeline)<br/>
+<span style="color: blue;">`-o AraTha_AGAT_stats`</span> Specifies the output file<br/>
+</span>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">Let's check the result:</p>
+
+
+<div class="alert alert-success" style="border-radius: 10px; padding: 10px;">
+  <pre style="color: black; background: transparent; border: none; margin: 0px 10px; padding: 0;">
+--------------------------------------------------------------------------------
+
+Compute mrna with isoforms if any
+
+Number of gene                               4252
+Number of mrna                               4771
+Number of cds                                4771
+Number of exon                               24223
+Number of intron                             19452
+Number of start_codon                        4757
+Number of stop_codon                         4769
+Number of exon in cds                        24223
+Number of intron in cds                      19452
+Number of intron in exon                     19452
+Number of intron in intron                   16034
+Number gene overlapping                      38
+Number of single exon gene                   1240
+Number of single exon mrna                   1353
+mean mrnas per gene                          1.1
+mean cdss per mrna                           1.0
+mean exons per mrna                          5.1
+mean introns per mrna                        4.1
+mean start_codons per mrna                   1.0
+mean stop_codons per mrna                    1.0
+mean exons per cds                           5.1
+mean introns in cdss per mrna                4.1
+mean introns in exons per mrna               4.1
+mean introns in introns per mrna             3.4
+Total gene length                            7678231
+Total mrna length                            8842281
+Total cds length                             5807925
+Total exon length                            5807925
+Total intron length                          3034356
+Total start_codon length                     14267
+Total stop_codon length                      14307
+Total intron length per cds                  3034356
+Total intron length per exon                 3034356
+Total intron length per intron               2683871
+....................................................
+--------------------------------------------------------------------------------
+</pre></div>
+
+<span style="color:black">
+<p class="text-justify">For the downstream quality check with **BUSCO**, we will retain only the longest isoforms:</span>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code58')">Copy</button>
+</div>
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code58" class="code-text">
+   <pre>agat_sp_keep_longest_isoform.pl \
+   -gff braker.gff3 \
+   -o longest_isoform_only.gff3</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`agat_sp_keep_longest_isoform.pl`</span> Identifies and retains only the longest transcripts for each gene<br/>
+<span style="color: blue;">`-gff braker.gff3`</span> Specifies the input GFF3 file<br/>
+<span style="color: blue;">`-o longest_isoform_only.gff3`</span> Specifies the output file name<br/>
+</span>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">And extract these protein sequences from the masked genome:</span>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code59')">Copy</button>
+</div>
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code59" class="code-text">
+   <pre>agat_sp_extract_sequences.pl \
+   --gff longest_isoform_only.gff3 \
+   -f Final_genome_with_Reference.fa.masked \
+   -p \
+   -o longest_isoform_only.fa
+</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`agat_sp_extract_sequences.pl`</span> Extract sequences based on annotations in a GFF3 file<br/>
+<span style="color: blue;">`--gff longest_isoform_only.gff3`</span> Specifies the input<br/>
+<span style="color: blue;">`-f Final_genome_with_Reference.fa.masked`</span> Specifies the input genome<br/>
+<span style="color: blue;">`-p`</span> Requests extraction of protein sequences instead of nucleotide sequences<br/>
+<span style="color: blue;">`-o longest_isoform_only.fa`</span> Specifies the output file<br/>
+</font>
+</div>
+
+# [V] Quality assessment
+## BUSCO
+<span style="color:black">
+<p class="text-justify">To assess genome assembly and annotation completeness, we will use Benchmarking Universal Single-Copy Orthologs (**[BUSCO](https://busco.ezlab.org/)**). Specifically, we will compare (1) the original genome assembly versus the one assembled here and (2) the predicted number of BUSCOs in the assembled genome versus the number of detected proteins with **BRAKER**.</p>
+
+<span style="color:black">
+<p class="text-justify">Let's first check the reference Chromosome 4:</p>
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code60')">Copy</button>
+</div>
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code60" class="code-text">
+   <pre>busco \
+   -m genome \
+   -i Arabidopsis_GWHBDNP00000000_chr4.fasta \
+   -o Embryophyta_1614_Ref_Genome \
+   -l embryophyta_odb10 \
+   --offline \
+   --download_path busco_downloads \
+   -c 22</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`busco`</span> Evaluates the completeness of genome assemblies,<br/>
+<span style="color: blue;">`-m genome`</span> Specifies the mode of operation<br/>
+<span style="color: blue;">`-i Arabidopsis_GWHBDNP00000000_chr4.fasta`</span> The input file<br/>
+<span style="color: blue;">`-o Embryophyta_1614_Ref_Genome`</span> Specifies the output file<br/>
+<span style="color: blue;">`-l embryophyta_odb10`</span> Specifies the lineage dataset to use<br/>
+<span style="color: blue;">`--offline`</span> Enables offline mode (BUSCO uses pre-downloaded datasets)<br/>
+<span style="color: blue;">`--download_path busco_downloads`</span> Specifies the directory where BUSCO datasets are stored<br/>
+<span style="color: blue;">`-c 22`</span> Specifies the number of CPU threads to use<br/>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">And our *de novo* assembled Chromosome 4:</p>
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code61')">Copy</button>
+</div>
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code61" class="code-text">
+   <pre>busco \
+   -m genome \
+   -i Final_genome_with_Reference.fa.masked \
+   -o Embryophyta_1614_Workshop_Genome \
+   -l embryophyta_odb10 \
+   --offline \
+   --download_path busco_downloads \
+   -c 22</pre></div>
+</div>
+
+</p>
+
+<span style="color:black">
+<p class="text-justify">Lastly, we will assess BUSCOs with the pre-computed protein sequences:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code62')">Copy</button>
+</div>
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code62" class="code-text">
+   <pre>busco \
+   -m protein \
+   -i longest_isoform_only.fa \
+   -o Embryophyta_Workshop_Protein_1614 \
+   -l embryophyta_odb10 \
+   --offline \
+   --download_path busco_downloads \
+   -c 44
+</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-info" style="display: flex; border-radius: 10px;">
+<span style="color:black;">
+Please note that you can also run **BUSCO** online using the web-based platform **[Galaxy](https://usegalaxy.eu/?tool_id=toolshed.g2.bx.psu.edu%2Frepos%2Fiuc%2Fbusco%2Fbusco%2F5.8.0%2Bgalaxy0&version=5.8.0%20galaxy0)**.
+</span>
+</div>
+
+<span style="color:black">
+<p class="text-justify">Time to check the results (**Figure 11**):</p>
+
+```{r, echo=FALSE, cache=FALSE}
+htmltools::tags$div(
+  style = "width: 100%; overflow: hidden; margin: 0; padding: 0;",
+  htmltools::tags$div(
+    style = "
+      transform: scale(0.85);
+      transform-origin: 0 0;
+      width: 977px;        
+      height: 800px;
+      margin-top: -50px;
+      margin-bottom: -200px;
+    ",
+    htmltools::tags$iframe(
+      title = "BUSCO",
+      src = "E:/Work_place_XTBG_China/Tutorial_XTBG_2025/Tutorial/Genome_Assembly_XTBG_2025/Fig_11_BUSCO.html",
+      style = "
+        border: none;
+        outline: none;
+        border-radius: 10px;
+        width: 100%;
+        height: 100%;
+      "
+    )
+  ))
+```
+<span style="color:black">
+<p class="text-center">**Figure 11**. BUSCO assessment results across the three datasets (Chromosome 4).</p>
+</p>
+
+<div class="alert alert-danger" style="border-radius: 10px; padding: 15px; margin: 20px 0;">
+  <span style="color: black; text-align: justify; display: block;">
+**IMPORTANT!** **BUSCO** has several algorithms that can potentially lead to different assessments of genome completeness [genome mode]. (1) Miniprot yields slightly higher completeness scores compared to Augustus and MetaEuk, making it a good choice for large genomes or when runtime is critical; (2) MetaEuk is very fast, especially for smaller genomes like fungi, though it may be slower than Miniprot for larger genomes; (3) Augustus is slower than both Miniprot and MetaEuk but is recommended when precise gene predictions are needed and you have time to optimise parameters. Additionally, the protein mode is standardised, there are no alternative tools (e.g., Miniprot vs. MetaEuk).
+</div>        
+</span>
+
+## QUAST
+<span style="color:black">
+<p class="text-justify">Next, to gather additional statistics on our assembly, we will use the **[QUality ASsessment Tool (QUAST)](http://quast.sourceforge.net/docs/manual.html)**:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code63')">Copy</button>
+</div>
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code63" class="code-text">
+   <pre>quast.py \
+Final_genome_with_Reference.fa.masked \
+-r Arabidopsis_GWHBDNP00000000_chr4.fasta \
+--min-alignment 20000 \
+--extensive-mis-size 500000 \
+--min-identity 90 \
+--threads 44</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`quast.py`</span> Assesses the quality of genome assemblies<br/>
+<span style="color: blue;">`Final_genome_with_Reference.fa.masked`</span> Specifies the input genome<br/>
+<span style="color: blue;">`-r Arabidopsis_GWHBDNP00000000_chr4.fasta`</span> Specifies the reference genome<br/>
+<span style="color: blue;">`--min-alignment 20000`</span> Specifies the min alignment length required for alignments between assembly and reference<br/>
+<span style="color: blue;">`--extensive-mis-size 500000`</span> Specifies the threshold for classifying large misassemblies<br/>
+<span style="color: blue;">`--min-identity 90`</span> Specifies the min sequence identity required for alignments between assembly and reference<br/>
+<span style="color: blue;">`--threads 44`</span> Specifies the number of CPU threads to use<br/>
+</span>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">Let's see the results (**Figure 12**):</p>
+
+```{r, echo=FALSE, cache=FALSE}
+htmltools::tags$div(
+  style = "width: 100%; overflow: hidden; margin: 0; padding: 0;",
+  htmltools::tags$div(
+    style = "
+      transform: scale(0.85);
+      transform-origin: 0 0;
+      width: 977px;        
+      height: 800px;
+      margin-bottom: -200px;
+    ",
+    htmltools::tags$iframe(
+      title = "QUAST",
+      src = "E:/Work_place_XTBG_China/Tutorial_XTBG_2025/Tutorial/Genome_Assembly_XTBG_2025/QUAST/icarus_viewers/contig_size_viewer.html",
+      style = "
+        border: none;
+        outline: none;
+        border-radius: 10px;
+        width: 100%;
+        height: 100%;
+      "
+    )
+  ))
+```
+<span style="color:black">
+<p class="text-center">**Figure 12**. Quality assessment statistics generated by **QUAST**.</p>
+</p>
+
+## Dot plot
+<span style="color:black">
+<p class="text-justify">Here, we can also use a dot plot (**Figure 9 = Figure 13**) to provide an intuitive, global view of how an assembled genome aligns to a reference (if available). Tools like **QUAST** or **BUSCO** offer quantitative metrics (e.g., N50, misassemblies, completeness), but dot plots add qualitative context. For instance, a dot plot can confirm that a genome is correctly ordered and oriented, even if **QUAST** flags minor misassemblies.</span>
+</p>
+
+```{r, echo=FALSE}
+htmltools::tags$div(
+  style = "width: 100%; overflow: hidden; margin: 0; padding: 0;",
+  htmltools::tags$div(
+    style = "
+      transform: scale(0.85);
+      transform-origin: 0 0;
+      width: 977px;        
+      height: 800px;       
+      margin-bottom: -100px;
+    ",
+    htmltools::tags$iframe(
+      title = "NP_Dgenies_Chr4",
+      src = "E:/Work_place_XTBG_China/Tutorial_XTBG_2025/Tutorial/Genome_Assembly_XTBG_2025/Fig_9_NP_Dgenies_Chr4_vs_GWHBDNP00000000.html",
+      style = "
+        border: none;
+        outline: none;
+        border-radius: 10px;
+        width: 100%;
+        height: 100%;
+      "
+    )
+  ))
+```
+
+<span style="color:black">
+<p class="text-center">**Figure 13**. Dot plot produced by D-Genies: Reference versus the genome assembled in this tutorial.</p>
+</p>
+
+## Synteny
+<span style="color:black">
+<p class="text-justify">Another way to verify if our assembly is correctly ordered and oriented is by comparing the gene order (**Figure 14**) in the newly assembled genome with the reference. This comparison helps evaluate large-scale structural accuracy. Additionally, syntenic plots are commonly used in comparative genomics to highlight similarities and differences between genomes of interest.</p>
+
+```{=html}
+<img src="E:/Work_place_XTBG_China/Tutorial_XTBG_2025/Tutorial/Genome_Assembly_XTBG_2025/Fig_14_Collinearity.svg" style="width: 100%; height: auto; border: 1px solid #ddd; border-radius: 10px;">
+```
+<span style="color:black">
+<p class="text-center">**Figure 14**. A visual explanation of the terms collinearity and synteny.</p>
+</p>
+
+<span style="color:black">
+<p class="text-justify">Here, we will compare the whole genomes of ***[Arabidopsis thaliana](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001735.4/)*** and ***[Arabidopsis arenosa](https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_905216605.1/)***. First, we will download their nucleotide sequences and annotated genomes:</span>
+</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code64')">Copy</button>
+</div>
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code64" class="code-text">
+   <pre>
+wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/905/216/605/GCA_905216605.1_AARE701a/GCA_905216605.1_AARE701a_genomic.gff.gz && pigz -d GCA_905216605.1_AARE701a_genomic.gff.gz && \
+wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/905/216/605/GCA_905216605.1_AARE701a/GCA_905216605.1_AARE701a_genomic.fna.gz && pigz -d GCA_905216605.1_AARE701a_genomic.fna.gz && \
+wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/735/GCF_000001735.4_TAIR10.1/GCF_000001735.4_TAIR10.1_genomic.gff.gz && pigz -d GCF_000001735.4_TAIR10.1_genomic.gff.gz && \
+wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/735/GCF_000001735.4_TAIR10.1/GCF_000001735.4_TAIR10.1_genomic.fna.gz && pigz -d GCF_000001735.4_TAIR10.1_genomic.fna.gz</pre></div>
+</div>
+
+</p>
+
+<span style="color:black">
+<p class="text-justify">We will keep only the longest isoforms:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code65')">Copy</button>
+</div>
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code65" class="code-text">
+   <pre>
+agat_sp_keep_longest_isoform.pl -gff GCA_905216605.1_AARE701a_genomic.gff \
+-o AraAre_longest_isoform_only.gff3 \
+&& \
+agat_sp_keep_longest_isoform.pl -gff GCF_000001735.4_TAIR10.1_genomic.gff \
+-o AraTha_longest_isoform_only.gff3</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-danger" style="border-radius: 10px; padding: 15px; margin: 20px 0;">
+  <span style="color: black; text-align: justify; display: block;">
+**IMPORTANT!** I had to remove some entries from `AraTha_longest_isoform_only.gff3` that were causing errors in the next steps:</div>        
+</span>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code66')">Copy</button>
+</div>
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code66" class="code-text">
+   <pre>
+grep -v -E '(ID|Parent)=(agat-gene-351|rna-DA397_mgp37)(;|$)' \
+AraTha_longest_isoform_only.gff3 > AraTha_longest_isoform_only_corrected.gff3 \
+&& \
+awk 'NR==FNR { len[$1]=$2; next } $1 in len && ($4 > len[$1] || $5 > len[$1]) { print "Invalid:" $0 }' \
+GCF_000001735.4_TAIR10.1_genomic.fna.fai AraTha_longest_isoform_only_corrected.gff3</pre></div>
+</div>
+
+</p>
+
+<span style="color:black">
+<p class="text-justify">We also need to create index files to enable efficient access to specific regions of the genomes in subsequent steps:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code67')">Copy</button>
+</div>
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code67" class="code-text">
+   <pre>
+samtools faidx GCF_000001735.4_TAIR10.1_genomic.fna \
+&& \
+samtools faidx GCA_905216605.1_AARE701a_genomic.fna</pre></div>
+</div>
+
+</p>
+
+<span style="color:black">
+<p class="text-justify">Next, we need to get the transcript sequences:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code68')">Copy</button>
+</div>
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code68" class="code-text">
+   <pre>
+gffread -g GCA_905216605.1_AARE701a_genomic.fna \
+-w AraAre_transcripts.fa AraAre_longest_isoform_only.gff3 \
+&& \   
+gffread -g GCF_000001735.4_TAIR10.1_genomic.fna \
+-w AraTha_transcripts.fa AraTha_longest_isoform_only_corrected.gff3</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`gffread`</span> Calls the tool for processing GFF/GTF files<br/>
+<span style="color: blue;">`-g GCA_905216605.1_AARE701a_genomic.fna`</span> Specifies the input genome<br/>
+<span style="color: blue;">`-w AraAre_transcripts.fa AraAre_longest_isoform_only.gff3`</span> Requests extraction of transcript sequences in FASTA format<br/>
+</span>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">Here, we will convert GFF3 into a simpler format used for genomic annotations (Browser Extensible Data or BED):</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code69')">Copy</button>
+</div>
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code69" class="code-text">
+   <pre>
+python -m jcvi.formats.gff bed --type=mRNA --key=ID AraAre_longest_isoform_only.gff3 \
+-o AraAre.bed \
+&& \
+python -m jcvi.formats.gff bed --type=mRNA --key=ID AraTha_longest_isoform_only_corrected.gff3 -o AraTha.bed</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`python`</span> Invokes the Python interpreter<br/>
+<span style="color: blue;">`-m`</span> Specifies a jcvi module<br/>
+<span style="color: blue;">`jcvi.formats.gff bed`</span> Converts a GFF3 file into BED format<br/>
+<span style="color: blue;">`--type=mRNA`</span> Specifies the feature type to extract from the GFF3 file (mRNA here)<br/>
+<span style="color: blue;">`---key=ID`</span> Specifies the attribute to use as the name for each BED entry<br/>
+<span style="color: blue;">`AraAre_longest_isoform_only.gff3`</span> The input file<br/>
+</span>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">Subsequently, we need to retrieve the coding sequences (CDS) from the transcripts:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code70')">Copy</button>
+</div>
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code70" class="code-text">
+   <pre>
+python -m jcvi.formats.fasta format AraTha_transcripts.fa AraTha.cds \
+&& \
+python -m jcvi.formats.fasta format AraAre_transcripts.fa AraAre.cds</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`jcvi.formats.fasta format`</span> Processes and reformates a FASTA file by extracting CDS<br/>
+<span style="color: blue;">`AraTha_transcripts.fa`</span> Specifies the input file<br/>
+<span style="color: blue;">`AraTha.cds`</span> Specifies the output file<br/>
+</span>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">Next, we will perform a pairwise synteny search:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code71')">Copy</button>
+</div>
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code71" class="code-text">
+   <pre>
+python -m jcvi.compara.catalog ortholog AraTha AraAre --no_strip_names</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`jcvi.compara.catalog ortholog`</span> Identifies orthologous gene pairs between two species based on their genome annotations<br/>
+<span style="color: blue;">`AraTha AraAre`</span> The pair of species being compared<br/>
+<span style="color: blue;">`--no_strip_names`</span> Preserves the original names in the output<br/>
+</span>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">Here, we need to perform a filtering step on synteny anchors to refine the results of the synteny analysis:</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code72')">Copy</button>
+</div>
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code72" class="code-text">
+   <pre>
+python -m jcvi.compara.synteny screen --simple --minspan=30 AraTha.AraAre.anchors AraTha.AraAre.anchors.anchors.new</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`jcvi.compara.synteny screen`</span> Filters and refines orthologous gene pairs based on user-defined criteria<br/>
+<span style="color: blue;">`--simple`</span> Simplifies the filtering process by focusing only on basic criteria<br/>
+<span style="color: blue;">`--minspan=30`</span> Specifies the minimum number of anchor pairs required for a synteny block to be retained<br/>
+<span style="color: blue;">`AraTha.AraAre.anchors`</span> The input file containing the initial set of orthologous gene pairs between the species<br/>
+<span style="color: blue;">`AraTha.AraAre.anchors.anchors.new`</span> Preserves the original names in the output<br/>
+
+</span>
+</font>
+</div>
+
+<span style="color:black">
+<p class="text-justify">Additionally, we need to create two files. On is `seqids` containing chromosome names of our two genomes:</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<font size="2">
+<span style="color:black">
+LR999451.1,LR999452.1,LR999453.1,LR999454.1,LR999455.1,LR999456.1,LR999457.1,LR999458.1<br/>
+NC_003070.9,NC_003071.7,NC_003074.8,NC_003075.7,NC_003076.8<br/>
+</span>
+</font>
+</div>
+
+</p>
+
+<span style="color:black">
+<p class="text-justify">The second one is `layout`, describing how we want our data to be rendered:</p>
+
+<div class="alert alert-success" style="border-radius: 10px; padding: 10px;">
+  <pre style="color: black; background: transparent; border: none; margin: 0px 10px; padding: 0;">
+# y, xstart, xend, rotation, color, label, va,  bed
+ .6,     .1,    .8,       0,      , AraAre, center, AraAre.bed
+ .4,     .1,    .8,       0,      , AraTha, center, AraTha.bed
+# edges
+e, 0, 1, AraTha.AraAre.anchors.anchors.simple</pre>
+</div>
+
+</p>
+
+<span style="color:black">
+<p class="text-justify">Finally, we will plot the results (**Figure 15**):</p>
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text">Unix</div>
+  <button class="copy-button" onclick="copyText('code73')">Copy</button>
+</div>
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code73" class="code-text">
+   <pre>
+python -m jcvi.graphics.karyotype seqids layout --chrstyle=roundrect --basepair</pre></div>
+</div>
+
+</p>
+
+<div class="alert alert-success" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+<span style="color: blue;">`jcvi.graphics.karyotype`</span> Invokes the karyotype plotting module from the jcvi library<br/>
+<span style="color: blue;">`seqids`</span> A file listing the chromosome/contig identifiers (e.g., chr1, chr2) to include in the plot<br/>
+<span style="color: blue;">`layout`</span> A configuration file specifying the arrangement of chromosomes in the plot (e.g., rows, spacing, colors)<br/>
+<span style="color: blue;">`--chrstyle=roundrect`</span> Draws chromosomes as rounded rectangles instead of default rectangles<br/>
+<span style="color: blue;">`--basepair`</span> Adds a scale bar to the plot, labeled in base pairs<br/>
+</span>
+</font>
+</div>
+
+```{=html}
+<img src="E:/Work_place_XTBG_China/Tutorial_XTBG_2025/Tutorial/Genome_Assembly_XTBG_2025/Fig_15_Karyotype.svg" style="width: 100%; height: auto; border: 1px solid #ddd; border-radius: 10px;">
+```
+<span style="color:black">
+<p class="text-center">**Figure 15**. Dot plot (top) and syntenic blocks (bottom) identified by **jcvi**.</p>
+</p>
+
+<div class="alert alert-info" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+Additionally, please consider using **[this tutorial](https://github.com/UMNKimballLab/Synteny-Tutorial)** for more detailed comparative analysis and visualisation steps.
+</span>
+</div>
+</p>
+
+## More
+<div class="alert alert-info" style="display: flex; border-radius: 10px;">
+<span style="color:black">
+You may also check **[my previous tutorial](https://niwdoog.github.io/Genome_Assembly_Long_Reads_Hi-C/#[V]_Quality_assessment__visualisation)** on additional tools you can use to assess the quality of your newly-assembled genomes.
+</span>
+</div>
+</p>
+
+# [VI] Software reference
+<span style="color:black">
+<p class="text-left">This section lists the software versions used in the Conda environment to ensure reproducibility and consistency:</p>
+<span style="color:black">
+
+<!-- Header Section -->
+<div class="code-header">
+  <div class="header-text"></div>
+  <button class="copy-button" onclick="copyText('code74')">Copy</button>
+</div>
+
+<!-- Content Section -->
+<div class="code-content">
+  <div id="code74" class="code-text">
+  <pre>agat=1.1.0 
+braker3=3.0.8
+busco=5.8.2
+cutadapt=5.0
+dgenies=1.5.0
+fastqc=0.12.1 
+flye=2.9.5
+gffread=0.12.7
+hisat2=2.2.1 
+jcvi=1.4.16
+juicer_tools=2.20.00
+minimap2=2.28  
+nanoplot=1.44.0 
+necat=0.0.1_update20200803
+nextpolish2=0.2.1 
+parallel=20240122
+pigz=2.8
+porechop=0.2.4
+quast=5.3.0
+repeatmasker=4.1.5 
+repeatmodeler=2.0.4 
+samtools=1.21  
+seqtk=1.4 
+sra-tools=2.9.6
+trim-galore=0.6.10
+wget=1.21.4</pre></div>
+</div>
+
+</p>
+
+# [VII] Cite
+<span style="color:black">
+<p class="text-left">Baiakhmetov E. (2025). *Quality check and genome assembly using Illumina, ONT, HiFi, and Hi-C data* [Tutorial]. GitHub. https://niwdoog.github.io/XYZ</p>
+<span style="color:black">
+<a href="https://doi.org/10.5281/zenodo.XYZ">  <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.7125249.svg" alt="DOI" style="width: 350px; height: auto;"></a>
+
+<script>
+function copyText(codeId) {
+  // Get the specific code block
+  const codeBlock = document.getElementById(codeId);
+  
+  // Remove <p> tags and extra whitespace
+  const rawText = codeBlock.textContent;
+  const cleanText = rawText
+    .replace(/<p>|<\/p>/g, '') // Remove any paragraph tags
+    .trim()
+    .replace(/\n\s+/g, '\n'); // Clean up extra spaces
+
+  // Copy to clipboard
+  navigator.clipboard.writeText(cleanText).then(() => {
+    // Find the clicked button
+    const buttons = document.querySelectorAll('.copy-button');
+    buttons.forEach(button => {
+      if (button.getAttribute('onclick').includes(codeId)) {
+        button.textContent = "Copied!";
+        setTimeout(() => {
+          button.textContent = "Copy";
+        }, 500);
+      }
+    });
+  });
+}
+</script>

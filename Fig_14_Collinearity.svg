@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 6007 2695" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <g>
+        <g transform="matrix(1.04725,0,0,0.320106,-396.779,597.937)">
+            <rect x="590.551" y="1776" width="2412.95" height="1890" style="fill:rgb(222,255,252);"/>
+        </g>
+        <g transform="matrix(-1.37753,0.924058,-0.939735,-0.634829,3393.24,548.001)">
+            <g transform="matrix(-0.364245,-0.530195,0.53919,-0.790382,940.493,2232.21)">
+                <path d="M991.569,1166.46L885.893,1155.79L957.837,1077.65C944.067,1108.29 960.933,1152.69 991.569,1166.46Z"/>
+                <path d="M1485.15,928.177C1485.15,928.177 1115.65,1068.52 956.941,1128.8" style="fill:none;stroke:black;stroke-width:31.67px;"/>
+            </g>
+        </g>
+        <path d="M2723.19,681.682C2723.38,682.632 2724.47,688.087 2720.82,693.559C2717.18,699.021 2711.73,700.117 2710.78,700.308L1492.25,943.703C1491.3,943.893 1485.84,944.983 1480.37,941.333C1478.69,940.209 1477.18,938.743 1476.05,937.062C1476.04,937.048 1473.62,931.277 1473.62,931.268C1473.62,929.18 1473.23,927.052 1473.64,925.005C1474.04,923.019 1474.87,921.086 1475.99,919.401C1479.61,913.971 1485.09,912.847 1486.04,912.652L2704.57,669.255C2706.66,669.262 2708.79,668.868 2710.84,669.278C2712.82,669.675 2714.76,670.503 2716.44,671.627C2721.91,675.277 2723,680.732 2723.19,681.682Z"/>
+        <g transform="matrix(1.37753,0.924058,0.939735,-0.634829,-422.948,548.001)">
+            <g transform="matrix(0.364245,0.530195,0.53919,-0.790382,-141.42,657.374)">
+                <path d="M2012.46,1077.65L2084.4,1155.79L1978.73,1166.46C2009.36,1152.69 2026.23,1108.29 2012.46,1077.65Z"/>
+                <path d="M1485.15,928.177C1485.15,928.177 1854.64,1068.52 2013.35,1128.8" style="fill:none;stroke:black;stroke-width:31.67px;"/>
+            </g>
+        </g>
+        <g transform="matrix(1,0,0,1,18.4308,0)">
+            <g transform="matrix(0.809333,0,0,0.809333,-1589.61,908.347)">
+                <g transform="matrix(1,0,0,1,-1117.65,-27.0039)">
+                    <g transform="matrix(0.145928,0,0,0.560761,3050.54,147.011)">
+                        <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(204,213,174);"/>
+                    </g>
+                    <g transform="matrix(1,0,0,1,-19.0377,-103.592)">
+                        <g transform="matrix(133.855,0,0,133.855,3556.5,836)">
+                        </g>
+                        <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:133.855px;">A&apos;</text>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,-1147.8,-27.0039)">
+                    <g transform="matrix(0.145928,0,0,0.560761,3703.71,147.011)">
+                        <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(250,237,205);"/>
+                    </g>
+                    <g transform="matrix(1,0,0,1,629.226,-103.592)">
+                        <g transform="matrix(133.855,0,0,133.855,3556.5,836)">
+                        </g>
+                        <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:133.855px;">B&apos;</text>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,-522.471,-27.0039)">
+                    <g transform="matrix(0.145928,0,0,0.560761,3701.39,147.011)">
+                        <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(188,108,37);"/>
+                    </g>
+                    <g transform="matrix(1,0,0,1,628.639,-103.592)">
+                        <g transform="matrix(133.855,0,0,133.855,3556.5,836)">
+                        </g>
+                        <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:133.855px;">C&apos;</text>
+                    </g>
+                </g>
+                <g transform="matrix(0.448017,0,0,1,2094.64,-823)">
+                    <path d="M3612.22,1579C3612.22,1580.21 3612.22,1587.17 3599.23,1592.99C3586.26,1598.8 3570.73,1598.81 3568.03,1598.81L365,1598.81C362.294,1598.81 346.76,1598.81 333.771,1592.99C329.771,1591.2 326.445,1589.03 324.271,1586.69C324.253,1586.67 320.777,1579 320.782,1578.99C321.941,1576.43 322.03,1573.72 324.271,1571.31C326.445,1568.97 329.771,1566.8 333.771,1565.01C335.683,1564.15 346.652,1559.24 364.972,1559.19C556.554,1558.68 748.142,1559.19 939.727,1559.19L3568,1559.19C3570.71,1559.19 3586.24,1559.19 3599.23,1565.01C3612.22,1570.83 3612.22,1577.79 3612.22,1579Z"/>
+                </g>
+                <g transform="matrix(1,0,0,1,-1010.64,-339.044)">
+                    <g transform="matrix(166.667,0,0,166.667,4533.22,836)">
+                    </g>
+                    <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">Descendant <tspan x="4412.86px " y="836px ">A</tspan></text>
+                </g>
+                <g transform="matrix(1.23558,0,0,1.23558,2666.16,-1690.07)">
+                    <text x="-277.664px" y="2366px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:116.667px;">The loci in the descendants are located on</text>
+                    <text x="-193.468px" y="2486.48px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:116.667px;">the same chromosome and in the same</text>
+                    <g transform="matrix(116.667,0,0,116.667,1803.59,2606.97)">
+                    </g>
+                    <text x="-5.594px" y="2606.97px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:116.667px;">order as in the ancestral species</text>
+                </g>
+            </g>
+            <g transform="matrix(0.809333,0,0,0.809333,-293.569,908.347)">
+                <g transform="matrix(1,0,0,1,-1117.65,-27.0039)">
+                    <g transform="matrix(0.145928,0,0,0.560761,3050.54,147.011)">
+                        <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(204,213,174);"/>
+                    </g>
+                    <g transform="matrix(1,0,0,1,-34.4297,-103.592)">
+                        <g transform="matrix(133.855,0,0,133.855,3588.13,836)">
+                        </g>
+                        <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:133.855px;">A&quot;</text>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,-1147.8,-27.0039)">
+                    <g transform="matrix(0.145928,0,0,0.560761,3703.71,147.011)">
+                        <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(250,237,205);"/>
+                    </g>
+                    <g transform="matrix(1,0,0,1,613.834,-103.592)">
+                        <g transform="matrix(133.855,0,0,133.855,3588.13,836)">
+                        </g>
+                        <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:133.855px;">B&quot;</text>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,-522.471,-27.0039)">
+                    <g transform="matrix(0.145928,0,0,0.560761,3701.39,147.011)">
+                        <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(188,108,37);"/>
+                    </g>
+                    <g transform="matrix(1,0,0,1,613.247,-103.592)">
+                        <g transform="matrix(133.855,0,0,133.855,3588.13,836)">
+                        </g>
+                        <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:133.855px;">C&quot;</text>
+                    </g>
+                </g>
+                <g transform="matrix(0.448017,0,0,1,2094.64,-823)">
+                    <path d="M3612.22,1579C3612.22,1580.21 3612.22,1587.17 3599.23,1592.99C3586.26,1598.8 3570.73,1598.81 3568.03,1598.81L365,1598.81C362.294,1598.81 346.76,1598.81 333.771,1592.99C329.771,1591.2 326.445,1589.03 324.271,1586.69C324.253,1586.67 320.777,1579 320.782,1578.99C321.941,1576.43 322.03,1573.72 324.271,1571.31C326.445,1568.97 329.771,1566.8 333.771,1565.01C335.683,1564.15 346.652,1559.24 364.972,1559.19C556.554,1558.68 748.142,1559.19 939.727,1559.19L3568,1559.19C3570.71,1559.19 3586.24,1559.19 3599.23,1565.01C3612.22,1570.83 3612.22,1577.79 3612.22,1579Z"/>
+                </g>
+                <g transform="matrix(1,0,0,1,-1010.64,-339.044)">
+                    <g transform="matrix(166.667,0,0,166.667,4539.41,836)">
+                    </g>
+                    <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">Descendant B</text>
+                </g>
+            </g>
+        </g>
+        <g transform="matrix(0.809333,0,0,0.809333,-1658.64,1040.45)">
+            <g transform="matrix(166.667,0,0,166.667,4381.94,836)">
+            </g>
+            <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">Collinearity</text>
+        </g>
+    </g>
+    <g transform="matrix(-1,0,0,1,6006.67,0)">
+        <g transform="matrix(1.04725,0,0,0.320106,-396.779,597.937)">
+            <rect x="590.551" y="1776" width="2412.95" height="1890" style="fill:rgb(228,255,222);"/>
+        </g>
+        <g transform="matrix(-1.37753,0.924058,-0.939735,-0.634829,3393.24,548.001)">
+            <g transform="matrix(0.364245,0.530195,0.53919,-0.790382,-1247.4,-952.498)">
+                <path d="M5048.84,1077.65L5120.78,1155.79L5015.1,1166.46C5045.74,1152.69 5062.61,1108.29 5048.84,1077.65Z"/>
+                <path d="M4521.53,928.177C4521.53,928.177 4891.02,1068.52 5049.73,1128.8" style="fill:none;stroke:black;stroke-width:31.67px;"/>
+            </g>
+        </g>
+        <path d="M2723.19,681.682C2723,680.732 2721.91,675.277 2716.44,671.627C2710.98,667.984 2705.52,669.066 2704.57,669.255L1486.05,912.65C1485.1,912.84 1479.64,913.929 1475.99,919.401C1474.87,921.086 1474.04,923.019 1473.64,925.005C1473.64,925.021 1473.62,931.28 1473.62,931.288C1474.43,933.213 1474.88,935.329 1476.05,937.062C1477.18,938.743 1478.69,940.209 1480.37,941.333C1485.8,944.955 1491.29,943.89 1492.24,943.705C1565.2,929.545 1638.01,914.589 1710.89,900.03L2710.77,700.31C2711.72,700.12 2717.17,699.031 2720.82,693.559C2724.47,688.087 2723.38,682.632 2723.19,681.682Z"/>
+        <g transform="matrix(1.37753,0.924058,0.939735,-0.634829,-422.948,548.001)">
+            <g transform="matrix(-0.364245,-0.530195,0.53919,-0.790382,2046.48,3842.08)">
+                <path d="M4027.95,1166.46L3922.27,1155.79L3994.22,1077.65C3980.45,1108.29 3997.31,1152.69 4027.95,1166.46Z"/>
+                <path d="M4521.53,928.177C4521.53,928.177 4152.03,1068.52 3993.32,1128.8" style="fill:none;stroke:black;stroke-width:31.67px;"/>
+            </g>
+        </g>
+        <g transform="matrix(-1,0,0,1,2951.86,0)">
+            <g transform="matrix(0.809333,0,0,0.809333,-1589.61,908.347)">
+                <g transform="matrix(1,0,0,1,-1117.65,-27.0039)">
+                    <g transform="matrix(0.145928,0,0,0.560761,3056.93,147.011)">
+                        <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(250,237,205);"/>
+                    </g>
+                    <g transform="matrix(1,0,0,1,-17.5535,-103.592)">
+                        <g transform="matrix(133.855,0,0,133.855,3556.5,836)">
+                        </g>
+                        <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:133.855px;">B&apos;</text>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,-1147.8,-27.0039)">
+                    <g transform="matrix(0.145928,0,0,0.560761,3703.71,147.011)">
+                        <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(204,213,174);"/>
+                    </g>
+                    <g transform="matrix(1,0,0,1,633.293,-91.8483)">
+                        <g transform="matrix(133.855,0,0,133.855,3556.5,836)">
+                        </g>
+                        <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:133.855px;">A&apos;</text>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,-1147.8,-27.0039)">
+                    <g transform="matrix(0.145928,0,0,0.560761,3702.87,147.011)">
+                        <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(204,213,174);"/>
+                    </g>
+                    <g transform="matrix(1,0,0,1,633.293,-103.592)">
+                        <g transform="matrix(133.855,0,0,133.855,3556.5,836)">
+                        </g>
+                        <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:133.855px;">A&apos;</text>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,-522.471,-27.0039)">
+                    <g transform="matrix(0.145928,0,0,0.560761,3706.04,147.011)">
+                        <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(188,108,37);"/>
+                    </g>
+                    <g transform="matrix(1,0,0,1,633.293,-103.592)">
+                        <g transform="matrix(133.855,0,0,133.855,3556.5,836)">
+                        </g>
+                        <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:133.855px;">C&apos;</text>
+                    </g>
+                </g>
+                <g transform="matrix(0.448017,0,0,1,2094.64,-823)">
+                    <path d="M3612.22,1579C3612.22,1580.21 3612.22,1587.17 3599.23,1592.99C3586.26,1598.8 3570.73,1598.81 3568.03,1598.81L365,1598.81C362.294,1598.81 346.76,1598.81 333.771,1592.99C329.771,1591.2 326.445,1589.03 324.271,1586.69C324.253,1586.67 320.777,1579 320.782,1578.99C321.941,1576.43 322.03,1573.72 324.271,1571.31C326.445,1568.97 329.771,1566.8 333.771,1565.01C335.683,1564.15 346.652,1559.24 364.972,1559.19C556.554,1558.68 748.142,1559.19 939.727,1559.19L3568,1559.19C3570.71,1559.19 3586.24,1559.19 3599.23,1565.01C3612.22,1570.83 3612.22,1577.79 3612.22,1579Z"/>
+                </g>
+                <g transform="matrix(1,0,0,1,-1010.64,-339.044)">
+                    <g transform="matrix(166.667,0,0,166.667,4533.22,836)">
+                    </g>
+                    <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">Descendant <tspan x="4412.86px " y="836px ">A</tspan></text>
+                </g>
+            </g>
+            <g transform="matrix(0.809333,0,0,0.809333,-293.569,908.347)">
+                <g transform="matrix(1,0,0,1,-1117.65,-27.0039)">
+                    <g transform="matrix(0.145928,0,0,0.560761,3067.42,147.011)">
+                        <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(204,213,174);"/>
+                    </g>
+                    <g transform="matrix(1,0,0,1,-17.5535,-103.592)">
+                        <g transform="matrix(133.855,0,0,133.855,3588.13,836)">
+                        </g>
+                        <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:133.855px;">A&quot;</text>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,-1147.8,-27.0039)">
+                    <g transform="matrix(0.145928,0,0,0.560761,3703.71,147.011)">
+                        <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(188,108,37);"/>
+                    </g>
+                    <g transform="matrix(1,0,0,1,615.566,-103.592)">
+                        <g transform="matrix(133.855,0,0,133.855,3588.13,836)">
+                        </g>
+                        <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:133.855px;">C&quot;</text>
+                    </g>
+                </g>
+                <g transform="matrix(1,0,0,1,-522.471,-27.0039)">
+                    <g transform="matrix(0.145928,0,0,0.560761,3701.39,147.011)">
+                        <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(188,108,37);"/>
+                    </g>
+                    <g transform="matrix(0.145928,0,0,0.560761,3701.39,147.011)">
+                        <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(250,237,205);"/>
+                    </g>
+                    <g transform="matrix(1,0,0,1,611.515,-103.592)">
+                        <g transform="matrix(133.855,0,0,133.855,3588.13,836)">
+                        </g>
+                        <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:133.855px;">B&quot;</text>
+                    </g>
+                </g>
+                <g transform="matrix(0.448017,0,0,1,2094.64,-823)">
+                    <path d="M3612.22,1579C3612.22,1580.21 3612.22,1587.17 3599.23,1592.99C3586.26,1598.8 3570.73,1598.81 3568.03,1598.81L365,1598.81C362.294,1598.81 346.76,1598.81 333.771,1592.99C329.771,1591.2 326.445,1589.03 324.271,1586.69C324.253,1586.67 320.777,1579 320.782,1578.99C321.941,1576.43 322.03,1573.72 324.271,1571.31C326.445,1568.97 329.771,1566.8 333.771,1565.01C335.683,1564.15 346.652,1559.24 364.972,1559.19C556.554,1558.68 748.142,1559.19 939.727,1559.19L3568,1559.19C3570.71,1559.19 3586.24,1559.19 3599.23,1565.01C3612.22,1570.83 3612.22,1577.79 3612.22,1579Z"/>
+                </g>
+                <g transform="matrix(1,0,0,1,-1010.64,-339.044)">
+                    <g transform="matrix(166.667,0,0,166.667,4539.41,836)">
+                    </g>
+                    <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">Descendant B</text>
+                </g>
+            </g>
+        </g>
+        <g transform="matrix(-0.809333,0,0,0.809333,4523.26,1040.45)">
+            <g transform="matrix(166.667,0,0,166.667,4122.66,836)">
+            </g>
+            <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">Synteny</text>
+        </g>
+        <g transform="matrix(-1,0,0,1,7745.42,-494.236)">
+            <g transform="matrix(166.667,0,0,166.667,6012.31,836)">
+            </g>
+            <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">Ancestral species with three loci</text>
+        </g>
+        <g transform="matrix(-1,0,0,1,2381.47,-459.481)">
+            <text x="-277.664px" y="2366px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:116.667px;">The loci in the descendants are located on</text>
+            <text x="-284.244px" y="2486.48px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:116.667px;">the same chromosome but not necessarily</text>
+            <g transform="matrix(116.667,0,0,116.667,2140.75,2606.97)">
+            </g>
+            <text x="-342.748px" y="2606.97px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:116.667px;">in the same order as in the ancestral species</text>
+        </g>
+    </g>
+    <g transform="matrix(1,0,0,1,0,-123)">
+        <g transform="matrix(1,0,0,1,-1117.65,-27.0039)">
+            <g transform="matrix(0.145928,0,0,0.560761,3050.54,147.011)">
+                <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(204,213,174);"/>
+            </g>
+            <g transform="matrix(1,0,0,1,-17.5535,-91.8483)">
+                <g transform="matrix(166.667,0,0,166.667,3548.36,836)">
+                </g>
+                <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">A</text>
+            </g>
+        </g>
+        <g transform="matrix(1,0,0,1,-1147.8,-27.0039)">
+            <g transform="matrix(0.145928,0,0,0.560761,3703.71,147.011)">
+                <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(250,237,205);"/>
+            </g>
+            <g transform="matrix(1,0,0,1,633.293,-91.8483)">
+                <g transform="matrix(166.667,0,0,166.667,3548.36,836)">
+                </g>
+                <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">B</text>
+            </g>
+        </g>
+        <g transform="matrix(1,0,0,1,-522.471,-27.0039)">
+            <g transform="matrix(0.145928,0,0,0.560761,3701.39,147.011)">
+                <ellipse cx="2876.5" cy="958.5" rx="647.5" ry="168.5" style="fill:rgb(188,108,37);"/>
+            </g>
+            <g transform="matrix(1,0,0,1,633.293,-91.8483)">
+                <g transform="matrix(166.667,0,0,166.667,3548.36,836)">
+                </g>
+                <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">C</text>
+            </g>
+        </g>
+        <g transform="matrix(0.448017,0,0,1,2094.64,-823)">
+            <path d="M3603.79,1579C3603.79,1579.98 3603.79,1585.61 3593.28,1590.32C3582.78,1595.03 3570.21,1595.03 3568.02,1595.03L365,1595.03C362.81,1595.03 350.238,1595.03 339.725,1590.32C336.488,1588.87 333.796,1587.12 332.037,1585.23C332.022,1585.21 329.209,1579 329.213,1578.99C330.151,1576.92 330.223,1574.73 332.037,1572.78C333.796,1570.88 336.488,1569.13 339.725,1567.68C350.167,1563 362.789,1562.97 364.978,1562.97C556.559,1562.56 748.144,1562.97 939.727,1562.97L3568,1562.97C3570.19,1562.97 3582.76,1562.97 3593.28,1567.68C3603.79,1572.39 3603.79,1578.02 3603.79,1579Z"/>
+        </g>
+    </g>
+    <g transform="matrix(1,0,0,1,-2489.64,1601.76)">
+        <g transform="matrix(166.667,0,0,166.667,7605.41,836)">
+        </g>
+        <text x="3428px" y="836px" style="font-family:'Arial-BoldMT', 'Arial';font-weight:700;font-size:166.667px;">! Sometimes these terms are used interchangeably !</text>
+    </g>
+</svg>
