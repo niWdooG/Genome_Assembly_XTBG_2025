@@ -1,4 +1,5 @@
 ---
+always_allow_html: true
 title:  "Quality check and genome assembly using Illumina, ONT, HiFi, and Hi-C data"
 author: <p class="text-right"><font size="1">Created by </font>[<font size="2">Evgenii Baiakhmetov</font>](https://www.researchgate.net/profile/Evgenii-Baiakhmetov)</p>
 output: 
