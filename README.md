@@ -1,4 +1,4 @@
-# Plant Genome Assembly & Quality Assessment (Illumina, ONT, HiFi, Hi-C)
+# Quality Check and Genome Assembly Using Illumina, ONT, HiFi, and Hi-C Data
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14851935.svg)](https://doi.org/10.5281/zenodo.14851935)
 [![GitHub Pages](https://img.shields.io/badge/Live-Interactive_Tutorial-2ea44f?logo=github)](https://niwdoog.github.io/Genome_Assembly_XTBG_2025/)
@@ -6,69 +6,77 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 > 📖 **Live Interactive Protocol & Tutorial:**  
-> Access the rendered step-by-step training modules, visual QC outputs, and executable bash scripts at:  
+> Access the rendered walkthrough with interactive dot plots, FastQC/NanoPlot reports, BUSCO charts, and code blocks at:  
 > **[https://niwdoog.github.io/Genome_Assembly_XTBG_2025/](https://niwdoog.github.io/Genome_Assembly_XTBG_2025/)**
 
 ---
 
 ## Overview
 
-This repository hosts practical materials and reproducible bioinformatic workflows developed for the *"Introduction to Bioinformatics and Omics Data Analysis"* workshop at the Xishuangbanna Tropical Botanical Garden (XTBG), Chinese Academy of Sciences. 
+This repository provides practical bioinformatic pipelines developed for the workshop ***Introduction to Bioinformatics and OMICs Data Analysis***, held at Xishuangbanna Tropical Botanical Garden (XTBG) from February 10–14, 2025 (led by Dr. Guillem Ylla). 
 
-The curriculum covers end-to-end data processing pipelines for plant genome assembly, transitioning from raw short- and long-read quality control to phased contig assembly, Hi-C scaffolding, and genomic completeness benchmarking.
+The curriculum demonstrates end-to-end processing—from raw read quality assessment through *de novo* assembly, short/long-read error polishing, repeat masking, structural annotation, and comparative synteny[cite: 5]. To ensure fast runtime during practical sessions, analyses focus on a downsized dataset containing Chromosome 4 (ca. 22.2 Mbp) of *Arabidopsis thaliana* using multi-platform sequencing data produced by Wang B et al. (2021)[cite: 5].
 
-### Sequencing Platforms & Computational Workflow
+---
 
-| Stage | Focus Area | Data Type / Tools |
+## Computational Pipeline & Tools
+
+| Workflow Stage | Focus Area | Tools & Packages Used |
 | :--- | :--- | :--- |
-| **I. Read Quality Control** | Ingestion, filtering, and metric profiling | Illumina, ONT, PacBio HiFi (FastQC, fastp, NanoPlot) |
-| **II. Genome Profiling** | Genome size, heterozygosity, and repeat fraction | *k*-mer profiling (Jellyfish, GenomeScope 2.0) |
-| **III. Contig Assembly** | Graph-based assembly and haplotype phasing | PacBio HiFi / ONT (Hifiasm, Flye, NextDenovo) |
-| **IV. Base Polishing** | Residual indel and substitution correction | Short/Long read alignment (NextPolish, Medaka) |
-| **V. Scaffolding** | Chromosome-level architecture via chromatin capture | Hi-C conformation capture (YaHS / Juicer / 3D-DNA) |
-| **VI. Benchmarking** | Contiguity, completeness, and consensus accuracy | QUAST, BUSCO, Merqury |
+| **Data Ingestion & Subsampling** | Format conversion, trimming, alignment & read sampling | `fasterq-dump` (sra-tools), `trim_galore`, `cutadapt`, `porechop`, `necat`, `hisat2`, `minimap2`, `samtools`, `seqtk`[cite: 5] |
+| **Read Quality Control** | Short- and long-read quality assessment | `FastQC`, `Trim Galore!`, `NanoPlot`[cite: 5] |
+| **De Novo Assembly & Polishing** | Long-read assembly, dot-plot validation & hybrid polishing | `Flye`, `D-Genies`, `minimap2`, `yak`, `nextPolish2`, `samtools`, `seqtk`[cite: 5] |
+| **Reference-Free Scaffolding** | Chromosome-scale Hi-C scaffolding guidance | `Juicer`, `Juicebox Assembly Tools`[cite: 5] |
+| **Transposable Elements** | *De novo* repeat modeling and soft-masking | `RepeatModeler`, `RepeatMasker`[cite: 5] |
+| **Structural Annotation** | RNA-Seq mapping, protein evidence integration & transcript extraction | `hisat2`, `samtools`, `BRAKER3`, `AGAT`, `gffread`[cite: 5] |
+| **Quality Assessment & Synteny** | Gene completeness, misassembly metrics & collinearity | `BUSCO` (`embryophyta_odb10`), `QUAST`, `D-Genies`, `jcvi`[cite: 5] |
 
 ---
 
-## Curriculum & Table of Contents
+## Table of Contents
 
-- **[01] Environment Setup & Data Acquisition**
-  - Linux HPC and environment management via Conda/Mamba
-  - Server hardware recommendations & multi-threading allocation
-  - Ingestion of public SRA/ENA sequencing runs
-- **[02] Raw Sequencing Data Quality Assessment**
-  - Short-read evaluation and adapter trimming
-  - Long-read length distributions and mean Q-score filtering
-  - Basecalling validation for Oxford Nanopore and PacBio HiFi
-- **[03] Pre-Assembly Genome Profiling**
-  - Counting *k*-mers from raw Illumina reads
-  - Model fitting for ploidy, heterozygosity, and genome size
-- **[04] De Novo Contig Assembly**
-  - Haplotype-aware assembly using PacBio HiFi data
-  - Long-read assembly strategies for ultra-long Nanopore reads
-  - Contig error correction and organellar/contaminant screening
-- **[05] Chromosome-Scale Hi-C Scaffolding**
-  - Alignment of chromatin conformation capture reads
-  - Contact matrix generation and scaffolding pipeline execution
-  - Manual curation and inversion verification
-- **[06] Final Quality Benchmarking & Validation**
-  - Assembly continuity assessment ($N50$, $L50$, total length) via QUAST
-  - Gene space completeness validation via lineage-specific BUSCO datasets
-  - Base-accuracy ($QV$) and phasing evaluation via Merqury
-
----
-
-## Citation
-
-If you use these materials, training pipelines, or code snippets in your research or teaching curricula, please cite the archived Zenodo release:
-
-```bibtex
-@manual{baiakhmetov_genome_assembly_xtbg_2025,
-  author       = {Baiakhmetov, Evgenii},
-  title        = {Quality check and genome assembly using Illumina, ONT, HiFi, and Hi-C data},
-  year         = {2025},
-  publisher    = {Zenodo},
-  version      = {v1.0.0},
-  doi          = {10.5281/zenodo.14851935},
-  url          = {[https://doi.org/10.5281/zenodo.14851935](https://doi.org/10.5281/zenodo.14851935)}
-}
+- **[I] Preface**[cite: 5]
+  - In a nutshell (Workshop context, dataset, and downsizing to Chr4)[cite: 5]
+  - Learning outcomes[cite: 5]
+  - Keywords[cite: 5]
+- **[II] Conda & Sequencing Data**[cite: 5]
+  - Conda, software, and packages[cite: 5]
+  - Downloading raw sequence data (Zenodo archive `14877608`)[cite: 5]
+  - Subsampling workflow[cite: 5]
+    - [1] Dataset setup (Illumina, RNAseq, Hi-C, HiFi, ONT)[cite: 5]
+    - [2] Reference genome download and Chromosome 4 extraction (`awk`, `minimap2`, `hisat2-build`)[cite: 5]
+    - [3] Trimming and alignment across data types[cite: 5]
+      - Illumina DNA data (`trim_galore`, `hisat2`, `samtools`, `seqtk`)[cite: 5]
+      - Illumina RNA data (`fasterq-dump`, `trim_galore`, `hisat2`, `samtools`)[cite: 5]
+      - Illumina Hi-C data (`trim_galore`, `hisat2`, `samtools`)[cite: 5]
+      - PacBio HiFi data (`cutadapt`, `minimap2`, `samtools`, `seqtk`)[cite: 5]
+      - ONT data (`porechop`, `necat correct`, `minimap2`, `samtools`)[cite: 5]
+    - [4] Subsampling for the QC chapter (`seqtk`)[cite: 5]
+- **[III] Genome Assembly**[cite: 5]
+  - Recap: Great Wall analogy and hybrid sequencing rationale[cite: 5]
+  - Quality check[cite: 5]
+    - Short-Read Sequencing: `FastQC` and `Trim Galore!`[cite: 5]
+    - Long-Read Sequencing: `NanoPlot` for PacBio HiFi and ONT reads[cite: 5]
+  - Assembly with a reference genome[cite: 5]
+    - [1] `Flye` contig assembly[cite: 5]
+    - [2] `D-Genies` synthetic similarity dot plots and contig filtering[cite: 5]
+    - [3] `NextPolish` (HiFi alignment via `minimap2`, *k*-mer profiling via `yak`, polishing via `nextPolish2`)[cite: 5]
+    - [4] Final notes: contig re-orientation (reversing Contig 6) and validation[cite: 5]
+  - Assembly without a reference genome (Hi-C scaffolding overview via `Juicer` and `Juicebox`)[cite: 5]
+- **[IV] Genome Annotation**[cite: 5]
+  - Repeat identification and masking[cite: 5]
+    - [1] `RepeatModeler` (`BuildDatabase`, `RepeatModeler`)[cite: 5]
+    - [2] `RepeatMasker` (soft-masking with custom repeat library)[cite: 5]
+  - Structural annotation[cite: 5]
+    - Header cleanup (`sed`) and Viridiplantae protein evidence preparation[cite: 5]
+    - RNA-Seq alignment (`hisat2`, `samtools`)[cite: 5]
+    - Gene prediction with `BRAKER3`[cite: 5]
+    - Annotation statistics and isoform filtering with `AGAT`[cite: 5]
+- **[V] Quality Assessment**[cite: 5]
+  - `BUSCO` assessment (reference genome vs. assembled genome vs. predicted proteins)[cite: 5]
+  - `QUAST` assembly contiguity and misassembly evaluation[cite: 5]
+  - `D-Genies` whole-chromosome dot-plot verification[cite: 5]
+  - Comparative synteny and collinearity analysis (*Arabidopsis thaliana* vs. *Arabidopsis arenosa* via `jcvi`)[cite: 5]
+- **[VI] Software Reference**[cite: 5]
+  - Complete list of conda package versions[cite: 5]
+- **[VII] Citation**[cite: 5]
